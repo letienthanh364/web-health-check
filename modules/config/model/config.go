@@ -16,18 +16,18 @@ var (
 
 type Config struct {
 	appCommon.SQLModel
-	Time      int `json:"time" gorm:"column:time"`
-	Limit     int `json:"limit" gorm:"column:limit"`
-	StartTime int `json:"start_time" gorm:"column:start_time"`
+	Time      int `json:"time" gorm:"column:time;"`
+	Limit     int `json:"limit" gorm:"column:limit;"`
+	StartTime int `json:"start_time" gorm:"column:start_time;"`
 }
 
 func (Config) TableName() string { return "configs" }
 
 type ConfigCreation struct {
 	Id        int `json:"id" gorm:"column:id;"`
-	Time      int `json:"time" gorm:"column:time"`
-	Limit     int `json:"limit" gorm:"column:limit"`
-	StartTime int `json:"start_time" gorm:"column:start_time"`
+	Time      int `json:"time" gorm:"column:time;"`
+	Limit     int `json:"limit" gorm:"column:limit;"`
+	StartTime int `json:"start_time" gorm:"column:start_time;"`
 }
 
 func (ConfigCreation) TableName() string { return Config{}.TableName() }
@@ -49,9 +49,9 @@ func (data *ConfigCreation) Validate() error {
 }
 
 type ConfigUpdate struct {
-	Time      *int    `json:"time" gorm:"column:time"`
-	Limit     *int    `json:"limit" gorm:"column:limit"`
-	StartTime *int    `json:"start_time" gorm:"column:start_time"`
+	Time      *int    `json:"time" gorm:"column:time;"`
+	Limit     *int    `json:"limit" gorm:"column:limit;"`
+	StartTime *int    `json:"start_time" gorm:"column:start_time;"`
 	Status    *string `json:"status" gorm:"column:status;"`
 }
 
