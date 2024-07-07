@@ -3,8 +3,8 @@ package jwt
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
-	"github.com/teddylethal/todo-list/appCommon"
-	"github.com/teddylethal/todo-list/component/tokenprovider"
+	"github.com/teddlethal/web-health-check/appCommon"
+	"github.com/teddlethal/web-health-check/component/tokenprovider"
 	"time"
 )
 

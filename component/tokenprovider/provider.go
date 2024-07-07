@@ -2,7 +2,7 @@ package tokenprovider
 
 import (
 	"errors"
-	"github.com/teddylethal/todo-list/appCommon"
+	"github.com/teddlethal/web-health-check/appCommon"
 	"net/http"
 )
 
