@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/teddlethal/web-health-check/middleware"
 	"github.com/teddlethal/web-health-check/routes"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -20,6 +21,7 @@ func main() {
 	log.Println("DB Connection: ", db)
 
 	r := gin.Default()
+	r.Use(middleware.Recover())
 
 	v1 := r.Group("/v1")
 	routes.ConfigRoutes(v1, db)
