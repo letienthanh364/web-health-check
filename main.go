@@ -31,5 +31,8 @@ func main() {
 			"message": "web health check",
 		})
 	})
-	r.Run(":2000")
+	errRun := r.Run(":2000")
+	if errRun != nil {
+		return
+	}
 }
