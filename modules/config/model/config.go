@@ -16,9 +16,10 @@ var (
 
 type Config struct {
 	appCommon.SQLModel
-	Time      int `json:"time" gorm:"column:time;"`
-	Limit     int `json:"limit" gorm:"column:limit;"`
-	StartTime int `json:"start_time" gorm:"column:start_time;"`
+	Time      int    `json:"time" gorm:"column:time;"`
+	Limit     int    `json:"limit" gorm:"column:limit;"`
+	StartTime int    `json:"start_time" gorm:"column:start_time;"`
+	Status    string `json:"status" gorm:"column:status"`
 }
 
 func (Config) TableName() string { return "configs" }

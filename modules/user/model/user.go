@@ -67,6 +67,7 @@ type User struct {
 	FirstName string   `json:"first_name" gorm:"column:first_name;"`
 	Phone     string   `json:"phone" gorm:"column:phone;"`
 	Role      UserRole `json:"role" gorm:"column:role;"`
+	Status    int      `json:"status" gorm:"column:status"`
 }
 
 func (u *User) GetUserId() int {
@@ -87,12 +88,12 @@ func (u User) TableName() string {
 
 type UserCreate struct {
 	appCommon.SQLModel
-	Email     string   `json:"email" gorm:"column:email;"`
-	Password  string   `json:"password" gorm:"column:password;"`
-	LastName  string   `json:"last_name" gorm:"column:last_name;"`
-	FirstName string   `json:"first_name" gorm:"column:first_name;"`
-	Role      UserRole `json:"-" gorm:"column:role;"`
-	Salt      string   `json:"-" gorm:"column:salt;"`
+	Email     string `json:"email" gorm:"column:email;"`
+	Password  string `json:"password" gorm:"column:password;"`
+	LastName  string `json:"last_name" gorm:"column:last_name;"`
+	FirstName string `json:"first_name" gorm:"column:first_name;"`
+	Role      string `json:"-" gorm:"column:role;"`
+	Salt      string `json:"-" gorm:"column:salt;"`
 }
 
 func (u UserCreate) TableName() string {
@@ -116,7 +117,7 @@ var (
 		"ErrEmailOrPasswordInvalid",
 	)
 
-	ErrEmailExist = appCommon.NewCustomError(
+	ErrEmailExisted = appCommon.NewCustomError(
 		http.StatusBadRequest,
 		errors.New("email has already existed"),
 		"email has already existed",

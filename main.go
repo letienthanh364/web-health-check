@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/middleware"
+	ginuser "github.com/teddlethal/web-health-check/modules/user/transport/gin"
 	"github.com/teddlethal/web-health-check/routes"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -24,6 +25,9 @@ func main() {
 	r.Use(middleware.Recover())
 
 	v1 := r.Group("/v1")
+	{
+		v1.POST("/register", ginuser.Register(db))
+	}
 	routes.ConfigRoutes(v1, db)
 
 	r.GET("/ping", func(c *gin.Context) {
