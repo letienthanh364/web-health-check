@@ -5,6 +5,8 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/teddlethal/web-health-check/appCommon"
 	"github.com/teddlethal/web-health-check/component/tokenprovider"
+
+	"log"
 	"time"
 )
 
@@ -13,8 +15,8 @@ type jwtProvider struct {
 	secret string
 }
 
-func NewTokenJwtProvider(prefix string) *jwtProvider {
-	return &jwtProvider{prefix: prefix}
+func NewTokenJwtProvider(prefix string, secret string) *jwtProvider {
+	return &jwtProvider{prefix: prefix, secret: secret}
 }
 
 type myClaims struct {
@@ -39,12 +41,12 @@ func (j *jwtProvider) SecretKey() string {
 func (j *jwtProvider) Generate(data tokenprovider.TokenPayload, expiry int) (tokenprovider.Token, error) {
 	now := time.Now()
 
-	t := jwt.NewWithClaims(jwt.SigningMethodES256, myClaims{
-		Payload: appCommon.TokenPayload{
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, myClaims{
+		appCommon.TokenPayload{
 			Uid:   data.UserId(),
-			Urole: data.Role(),
+			URole: data.Role(),
 		},
-		StandardClaims: jwt.StandardClaims{
+		jwt.StandardClaims{
 			ExpiresAt: now.Local().Add(time.Second * time.Duration(expiry)).Unix(),
 			IssuedAt:  now.Local().Unix(),
 			Id:        fmt.Sprintf("%d", now.UnixNano()),
@@ -53,9 +55,11 @@ func (j *jwtProvider) Generate(data tokenprovider.TokenPayload, expiry int) (tok
 
 	myToken, err := t.SignedString([]byte(j.secret))
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 
+	// return the token
 	return &token{
 		Token:   myToken,
 		Expiry:  expiry,
