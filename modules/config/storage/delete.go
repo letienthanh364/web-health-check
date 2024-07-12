@@ -1,15 +1,16 @@
-package storage
+package storageconfig
 
 import (
 	"context"
+	"github.com/teddlethal/web-health-check/appCommon"
 	"github.com/teddlethal/web-health-check/modules/config/model"
 )
 
 func (s *sqlStore) DeleteConfig(ctx context.Context, cond map[string]interface{}) error {
-	deletedStatus := "Deleted"
+	deletedStatus := "deleted"
 
 	if err := s.db.Where(cond).Updates(&modelconfig.ConfigUpdate{Status: &deletedStatus}).Error; err != nil {
-		return err
+		return appCommon.ErrDB(err)
 	}
 
 	return nil

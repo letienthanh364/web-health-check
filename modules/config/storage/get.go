@@ -1,7 +1,8 @@
-package storage
+package storageconfig
 
 import (
 	"context"
+	"github.com/teddlethal/web-health-check/appCommon"
 	"github.com/teddlethal/web-health-check/modules/config/model"
 )
 
@@ -9,7 +10,7 @@ func (s *sqlStore) GetConfig(ctx context.Context, cond map[string]interface{}) (
 	var data modelconfig.Config
 
 	if err := s.db.Where(cond).First(&data).Error; err != nil {
-		return nil, err
+		return nil, appCommon.ErrDB(err)
 	}
 
 	return &data, nil

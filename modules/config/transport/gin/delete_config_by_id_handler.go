@@ -20,7 +20,7 @@ func DeleteConfig(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		store := storage.NewSqlStore(db)
+		store := storageconfig.NewSqlStore(db)
 		business := biz.NewDeleteConfigBiz(store)
 
 		if err := business.DeleteConfigById(c.Request.Context(), id); err != nil {

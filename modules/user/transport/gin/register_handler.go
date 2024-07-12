@@ -20,7 +20,7 @@ func Register(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		store := storage.NewSqlStore(db)
+		store := storageuser.NewSqlStore(db)
 		md5 := appCommon.NewMd5Hash()
 		business := biz.NewRegisterBiz(store, md5)
 

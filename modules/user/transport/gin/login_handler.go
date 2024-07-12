@@ -22,7 +22,7 @@ func Login(db *gorm.DB, tokenProvider tokenprovider.Provider) gin.HandlerFunc {
 			return
 		}
 
-		store := storage.NewSqlStore(db)
+		store := storageuser.NewSqlStore(db)
 		md5 := appCommon.NewMd5Hash()
 		business := biz.NewLoginBiz(store, tokenProvider, md5, 60*60*24*30)
 		account, err := business.Login(c.Request.Context(), &loginUserData)

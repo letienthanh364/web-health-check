@@ -26,7 +26,7 @@ func ListConfig(db *gorm.DB) func(ctx *gin.Context) {
 
 		queryString.Paging.Process()
 
-		store := storage.NewSqlStore(db)
+		store := storageconfig.NewSqlStore(db)
 		business := biz.NewListConfigBiz(store)
 
 		res, err := business.ListConfig(c.Request.Context(), &queryString.Filter, &queryString.Paging)

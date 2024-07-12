@@ -1,4 +1,4 @@
-package storage
+package storageconfig
 
 import "gorm.io/gorm"
 

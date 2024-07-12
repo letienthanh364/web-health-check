@@ -21,7 +21,7 @@ func GetConfigById(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		store := storage.NewSqlStore(db)
+		store := storageconfig.NewSqlStore(db)
 		business := biz.NewGetConfigBiz(store)
 
 		data, err := business.GetConfigById(c.Request.Context(), id)

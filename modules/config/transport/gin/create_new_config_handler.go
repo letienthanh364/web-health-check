@@ -21,7 +21,7 @@ func CreateConfig(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		store := storage.NewSqlStore(db)
+		store := storageconfig.NewSqlStore(db)
 		business := biz.CreateConfigStorage(store)
 
 		if err := business.CreateConfig(c.Request.Context(), &createData); err != nil {

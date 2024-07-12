@@ -30,7 +30,7 @@ func UpdateConfig(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		store := storage.NewSqlStore(db)
+		store := storageconfig.NewSqlStore(db)
 		business := biz.NewUpdateConfigBiz(store)
 
 		if err := business.UpdateConfig(c.Request.Context(), id, &updateData); err != nil {

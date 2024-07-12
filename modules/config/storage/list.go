@@ -1,4 +1,4 @@
-package storage
+package storageconfig
 
 import (
 	"context"
@@ -31,7 +31,7 @@ func (s *sqlStore) ListConfig(ctx context.Context,
 		Table(modelconfig.Config{}.TableName()).
 		Select("id").
 		Count(&paging.Total).Error; err != nil {
-		return nil, err
+		return nil, appCommon.ErrDB(err)
 	}
 
 	if err := db.
@@ -40,7 +40,7 @@ func (s *sqlStore) ListConfig(ctx context.Context,
 		Limit(paging.Limit).
 		Order("id desc").
 		Find(&res).Error; err != nil {
-		return nil, err
+		return nil, appCommon.ErrDB(err)
 	}
 
 	return res, nil
