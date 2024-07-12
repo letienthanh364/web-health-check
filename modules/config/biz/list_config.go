@@ -9,10 +9,10 @@ import (
 type ListConfigStorage interface {
 	ListConfig(
 		ctx context.Context,
-		filter *configmodel.Filter,
+		filter *modelconfig.Filter,
 		paging *appCommon.Paging,
 		moreKeys ...string,
-	) ([]configmodel.Config, error)
+	) ([]modelconfig.Config, error)
 }
 
 type listConfigBiz struct {
@@ -24,10 +24,10 @@ func NewListConfigBiz(store ListConfigStorage) *listConfigBiz {
 }
 
 func (biz *listConfigBiz) ListConfig(ctx context.Context,
-	filter *configmodel.Filter,
+	filter *modelconfig.Filter,
 	paging *appCommon.Paging,
 	moreKeys ...string,
-) ([]configmodel.Config, error) {
+) ([]modelconfig.Config, error) {
 	data, err := biz.store.ListConfig(ctx, filter, paging)
 
 	if err != nil {

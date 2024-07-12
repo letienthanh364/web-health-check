@@ -8,7 +8,7 @@ import (
 func (s *sqlStore) DeleteConfig(ctx context.Context, cond map[string]interface{}) error {
 	deletedStatus := "Deleted"
 
-	if err := s.db.Where(cond).Updates(&configmodel.ConfigUpdate{Status: &deletedStatus}).Error; err != nil {
+	if err := s.db.Where(cond).Updates(&modelconfig.ConfigUpdate{Status: &deletedStatus}).Error; err != nil {
 		return err
 	}
 

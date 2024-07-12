@@ -7,10 +7,10 @@ import (
 )
 
 func (s *sqlStore) ListConfig(ctx context.Context,
-	filter *configmodel.Filter,
+	filter *modelconfig.Filter,
 	paging *appCommon.Paging,
-	moreKeys ...string) ([]configmodel.Config, error) {
-	var res []configmodel.Config
+	moreKeys ...string) ([]modelconfig.Config, error) {
+	var res []modelconfig.Config
 
 	db := s.db.Where("status <> ?", "deleted")
 
@@ -28,7 +28,7 @@ func (s *sqlStore) ListConfig(ctx context.Context,
 	//}
 
 	if err := db.
-		Table(configmodel.Config{}.TableName()).
+		Table(modelconfig.Config{}.TableName()).
 		Select("id").
 		Count(&paging.Total).Error; err != nil {
 		return nil, err

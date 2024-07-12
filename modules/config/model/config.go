@@ -1,4 +1,4 @@
-package configmodel
+package modelconfig
 
 import (
 	"errors"

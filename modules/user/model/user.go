@@ -87,7 +87,7 @@ func (u User) TableName() string {
 }
 
 type UserCreate struct {
-	appCommon.SQLModel
+	Id        int    `json:"id" gorm:"column:id;"`
 	Email     string `json:"email" gorm:"column:email;"`
 	Password  string `json:"password" gorm:"column:password;"`
 	LastName  string `json:"last_name" gorm:"column:last_name;"`

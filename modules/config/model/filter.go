@@ -1,4 +1,4 @@
-package configmodel
+package modelconfig
 
 type Filter struct {
 	Time       *int `json:"time,omitempty" gorm:"column:time;"`

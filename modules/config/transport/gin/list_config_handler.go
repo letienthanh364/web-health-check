@@ -14,7 +14,7 @@ func ListConfig(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 		var queryString struct {
 			appCommon.Paging
-			configmodel.Filter
+			modelconfig.Filter
 		}
 
 		if err := c.ShouldBind(&queryString); err != nil {
