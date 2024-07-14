@@ -7,13 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
-func CustomerRoutes(router *gin.RouterGroup, db *gorm.DB) {
-	items := router.Group("/customer")
+func CustomerRoutes(router *gin.RouterGroup, db *gorm.DB, middleware func(c *gin.Context)) {
+
+	items := router.Group("/customer", middleware)
 	{
 		items.POST("", gincustomer.CreateCustomer(db))
-		items.GET("", ginconfig.ListConfig(db))
-		items.GET("/:configId", ginconfig.GetConfigById(db))
-		items.PATCH("/:configId", ginconfig.UpdateConfig(db))
-		items.DELETE("/:configId", ginconfig.DeleteConfig(db))
+		items.GET("", gincustomer.ListCustomer(db))
+		items.GET("/:id", gincustomer.FindCustomer(db))
+		items.PATCH("/:id", ginconfig.UpdateConfig(db))
+		items.DELETE("/:id", ginconfig.DeleteConfig(db))
 	}
 }

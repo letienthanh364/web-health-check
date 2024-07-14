@@ -3,7 +3,7 @@ package appCommon
 import "fmt"
 
 const (
-	CurrentUser = "current_suer"
+	CurrentUser = "current_user"
 )
 
 func Recovery() {

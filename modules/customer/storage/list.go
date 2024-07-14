@@ -12,7 +12,7 @@ func (s *sqlStore) ListCustomer(ctx context.Context,
 	moreKeys ...string) ([]modelcustomer.Customer, error) {
 	var res []modelcustomer.Customer
 
-	db := s.db.Where("status <> ?", "deleted")
+	db := s.db.Where("status <> ?", "0")
 
 	if err := db.
 		Table(modelcustomer.Customer{}.TableName()).

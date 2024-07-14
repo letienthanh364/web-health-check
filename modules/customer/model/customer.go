@@ -23,12 +23,13 @@ const (
 
 type Customer struct {
 	appCommon.SQLModel
-	WebsiteId     int    `json:"website_id,omitempty" gorm:"column:website_id;"`
+	WebsiteId     int    `json:"website_id" gorm:"column:website_id;"`
 	Name          string `json:"name" gorm:"column:name;"`
 	Email         string `json:"email" gorm:"column:email;"`
 	Phone         string `json:"phone" gorm:"column:phone;"`
 	ContactMethod string `json:"contact_method" gorm:"column:contact_method;"`
 	Link          string `json:"link" gorm:"column:link;"`
+	Status        int    `json:"status" gorm:"column:status;"`
 }
 
 func (Customer) TableName() string {
@@ -86,6 +87,7 @@ type CustomerUpdate struct {
 	Phone         *string `json:"phone" gorm:"column:phone;"`
 	ContactMethod *string `json:"contact_method" gorm:"column:contact_method;"`
 	Link          *string `json:"link" gorm:"column:link;"`
+	Status        *int    `json:"status" gorm:"column:status;"`
 }
 
 func (CustomerUpdate) TableName() string {

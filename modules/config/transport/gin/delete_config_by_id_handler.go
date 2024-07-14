@@ -12,7 +12,7 @@ import (
 
 func DeleteConfig(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("configId"))
+		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),

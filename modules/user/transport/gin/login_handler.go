@@ -28,9 +28,7 @@ func Login(db *gorm.DB, tokenProvider tokenprovider.Provider) gin.HandlerFunc {
 		account, err := business.Login(c.Request.Context(), &loginUserData)
 
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
