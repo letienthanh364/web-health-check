@@ -37,6 +37,7 @@ func main() {
 		v1.POST("/login", ginuser.Login(db, tokenProvider))
 	}
 	routes.ConfigRoutes(v1, db)
+	routes.CustomerRoutes(v1, db)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
