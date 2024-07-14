@@ -8,34 +8,35 @@ import (
 	storagecustomer "github.com/teddlethal/web-health-check/modules/customer/storage"
 	"gorm.io/gorm"
 	"net/http"
+	"strconv"
 )
 
-func ListCustomer(db *gorm.DB) func(ctx *gin.Context) {
+func UpdateCustomer(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
-		var queryString struct {
-			appCommon.Paging
-			modelcustomer.Filter
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
 		}
 
-		if err := c.ShouldBind(&queryString); err != nil {
+		var updateData modelcustomer.CustomerUpdate
+
+		if err := c.ShouldBind(&updateData); err != nil {
 			c.JSON(http.StatusBadRequest, appCommon.ErrInvalidRequest(err))
 			return
 		}
 
-		queryString.Paging.Process()
-
 		requester := c.MustGet(appCommon.CurrentUser).(appCommon.Requester)
 		store := storagecustomer.NewSqlStore(db)
-		business := bizcustomer.NewListCustomerBiz(store, requester)
+		business := bizcustomer.NewUpdateCustomerBiz(store, requester)
 
-		res, err := business.ListCustomer(c.Request.Context(), &queryString.Filter, &queryString.Paging)
-
-		if err != nil {
+		if err := business.UpdateCustomerById(c.Request.Context(), id, &updateData); err != nil {
 			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, appCommon.NewSuccessResponse(res, queryString.Filter, queryString.Paging))
-
+		c.JSON(http.StatusOK, appCommon.SimpleSuccessResponse("success"))
 	}
 }

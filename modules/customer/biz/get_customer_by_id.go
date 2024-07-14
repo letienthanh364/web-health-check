@@ -21,6 +21,10 @@ func NewGetCustomerBiz(store GetCustomerStorage) *getCustomerBiz {
 func (biz *getCustomerBiz) GetCustomerById(ctx context.Context, id int) (*modelcustomer.Customer, error) {
 	data, err := biz.store.GetCustomer(ctx, map[string]interface{}{"id": id})
 
+	if data.Status == "deleted" {
+		return nil, modelcustomer.ErrCustomerIsDeleted
+	}
+
 	if err != nil {
 		return nil, appCommon.ErrCannotGetEntity(modelcustomer.EntityName, err)
 	}
