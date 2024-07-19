@@ -1,16 +1,16 @@
-package ginconfig
+package ginwebsite
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/appCommon"
-	"github.com/teddlethal/web-health-check/modules/config/biz"
-	"github.com/teddlethal/web-health-check/modules/config/storage"
+	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
+	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
 
-func GetConfigById(db *gorm.DB) func(ctx *gin.Context) {
+func GetWebsiteById(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 
 		id, err := strconv.Atoi(c.Param("id"))
@@ -21,10 +21,10 @@ func GetConfigById(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		store := storageconfig.NewSqlStore(db)
-		business := bizconfig.NewGetConfigBiz(store)
+		store := storagewebsite.NewSqlStore(db)
+		business := bizwebsite.NewGetWebsiteBiz(store)
 
-		data, err := business.GetConfigById(c.Request.Context(), id)
+		data, err := business.GetWebsiteById(c.Request.Context(), id)
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{

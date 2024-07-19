@@ -7,7 +7,6 @@ import (
 )
 
 func CustomerRoutes(router *gin.RouterGroup, db *gorm.DB, middleware func(c *gin.Context)) {
-
 	items := router.Group("/customer", middleware)
 	{
 		items.POST("", gincustomer.CreateCustomer(db))

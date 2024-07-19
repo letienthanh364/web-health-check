@@ -1,16 +1,16 @@
-package ginconfig
+package ginwebsite
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/appCommon"
-	"github.com/teddlethal/web-health-check/modules/config/biz"
-	"github.com/teddlethal/web-health-check/modules/config/storage"
+	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
+	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
 
-func DeleteConfig(db *gorm.DB) func(ctx *gin.Context) {
+func DeleteWebsite(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -20,10 +20,10 @@ func DeleteConfig(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		store := storageconfig.NewSqlStore(db)
-		business := bizconfig.NewDeleteConfigBiz(store)
+		store := storagewebsite.NewSqlStore(db)
+		business := bizwebsite.NewDeleteWebsiteBiz(store)
 
-		if err := business.DeleteConfigById(c.Request.Context(), id); err != nil {
+		if err := business.DeleteWebsiteById(c.Request.Context(), id); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})

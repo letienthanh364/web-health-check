@@ -1,20 +1,21 @@
-package ginconfig
+package ginwebsite
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/appCommon"
-	"github.com/teddlethal/web-health-check/modules/config/biz"
-	"github.com/teddlethal/web-health-check/modules/config/model"
-	"github.com/teddlethal/web-health-check/modules/config/storage"
+	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
+	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
+	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
+
 	"gorm.io/gorm"
 	"net/http"
 )
 
-func ListConfig(db *gorm.DB) func(ctx *gin.Context) {
+func ListWebsite(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 		var queryString struct {
 			appCommon.Paging
-			modelconfig.Filter
+			modelwebsite.Filter
 		}
 
 		if err := c.ShouldBind(&queryString); err != nil {
@@ -26,10 +27,10 @@ func ListConfig(db *gorm.DB) func(ctx *gin.Context) {
 
 		queryString.Paging.Process()
 
-		store := storageconfig.NewSqlStore(db)
-		business := bizconfig.NewListConfigBiz(store)
+		store := storagewebsite.NewSqlStore(db)
+		business := bizwebsite.NewListWebsiteBiz(store)
 
-		res, err := business.ListConfig(c.Request.Context(), &queryString.Filter, &queryString.Paging)
+		res, err := business.ListWebsite(c.Request.Context(), &queryString.Filter, &queryString.Paging)
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{

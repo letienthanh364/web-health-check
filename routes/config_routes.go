@@ -6,8 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func ConfigRoutes(router *gin.RouterGroup, db *gorm.DB) {
-	items := router.Group("/config")
+func ConfigRoutes(router *gin.RouterGroup, db *gorm.DB, middleware func(c *gin.Context)) {
+	items := router.Group("/config", middleware)
 	{
 		items.POST("", ginconfig.CreateConfig(db))
 		items.GET("", ginconfig.ListConfig(db))

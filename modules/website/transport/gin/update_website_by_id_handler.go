@@ -1,17 +1,17 @@
-package ginconfig
+package ginwebsite
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/appCommon"
-	"github.com/teddlethal/web-health-check/modules/config/biz"
-	configmodel "github.com/teddlethal/web-health-check/modules/config/model"
-	"github.com/teddlethal/web-health-check/modules/config/storage"
+	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
+	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
+	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
 
-func UpdateConfig(db *gorm.DB) func(ctx *gin.Context) {
+func UpdateWebsite(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -21,7 +21,7 @@ func UpdateConfig(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		var updateData configmodel.ConfigUpdate
+		var updateData modelwebsite.WebsiteUpdate
 
 		if err := c.ShouldBind(&updateData); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -30,10 +30,10 @@ func UpdateConfig(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		store := storageconfig.NewSqlStore(db)
-		business := bizconfig.NewUpdateConfigBiz(store)
+		store := storagewebsite.NewSqlStore(db)
+		business := bizwebsite.NewUpdateWebsiteBiz(store)
 
-		if err := business.UpdateConfig(c.Request.Context(), id, &updateData); err != nil {
+		if err := business.UpdateWebsite(c.Request.Context(), id, &updateData); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
