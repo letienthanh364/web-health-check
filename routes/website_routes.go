@@ -7,7 +7,7 @@ import (
 )
 
 func WebsiteRoutes(router *gin.RouterGroup, db *gorm.DB, middleware func(c *gin.Context)) {
-	items := router.Group("/config", middleware)
+	items := router.Group("/website", middleware)
 	{
 		items.POST("", ginwebsite.CreateWebsite(db))
 		items.GET("", ginwebsite.ListWebsite(db))

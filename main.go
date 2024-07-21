@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/component/tokenprovider/jwt"
+	"github.com/teddlethal/web-health-check/linkchecker"
 	"github.com/teddlethal/web-health-check/middleware"
 	storageuser "github.com/teddlethal/web-health-check/modules/user/storage"
 	ginuser "github.com/teddlethal/web-health-check/modules/user/transport/gin"
@@ -40,13 +41,26 @@ func main() {
 	routes.ConfigRoutes(v1, db, middlewareAuth)
 	routes.CustomerRoutes(v1, db, middlewareAuth)
 	routes.WebsiteRoutes(v1, db, middlewareAuth)
+	routes.CheckerRoutes(v1)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "web health check",
 		})
 	})
+
+	// Set up the website business logic
+
+	// Fetch the list of websites and start the link checker
+	configs := linkchecker.FetchWebsites(db)
+	lc := linkchecker.NewLinkChecker(configs)
+	lc.Start()
+
+	// Ensure the cron job is stopped gracefully on program exit
+	defer lc.Stop()
+
 	errRun := r.Run(":2000")
+
 	if errRun != nil {
 		return
 	}

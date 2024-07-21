@@ -12,6 +12,7 @@ const (
 
 var (
 	ErrWebsiteIsDeleted    = errors.New("website is deleted")
+	ErrNameCannotBeEmpty   = errors.New("name cannot be empty")
 	ErrPathCannotBeEmpty   = errors.New("path cannot be empty")
 	ErrLimitInvalid        = errors.New("limit is invalid")
 	ErrRetryInvalid        = errors.New("retry is invalid")
@@ -20,15 +21,16 @@ var (
 
 type Website struct {
 	appCommon.SQLModel
-	Path   string `json:"name" gorm:"column:name;"`
+	Name   string `json:"name" gorm:"column:name;"`
+	Path   string `json:"path" gorm:"column:path;"`
 	Limit  int    `json:"limit" gorm:"column:limit;"`
 	Retry  int    `json:"retry" gorm:"column:retry;"`
 	Emails string `json:"emails" gorm:"column:emails;"`
-	//Discords   string `json:"discords" gorm:"column:discords;"`
-	//Facebooks  string `json:"facebooks" gorm:"column:facebooks;"`
-	//Phones     string `json:"phones" gorm:"column:phones;"`
-	//OtherLinks string `json:"other_links" gorm:"column:other_links;"`
 	Status string `json:"status" gorm:"column:status;"`
+	//Discords   []int `json:"discords"`
+	//Facebooks  []int `json:"facebooks"`
+	//Phones     []int `json:"phones"`
+	//OtherLinks []int `json:"other_links"`
 }
 
 func (Website) TableName() string {
@@ -37,7 +39,8 @@ func (Website) TableName() string {
 
 type WebsiteCreation struct {
 	Id     int    `json:"id" gorm:"column:id;"`
-	Path   string `json:"name" gorm:"column:name;"`
+	Name   string `json:"name" gorm:"column:name;"`
+	Path   string `json:"path" gorm:"column:path;"`
 	Limit  int    `json:"limit" gorm:"column:limit;"`
 	Retry  int    `json:"retry" gorm:"column:retry;"`
 	Emails string `json:"emails" gorm:"column:emails;"`
@@ -49,21 +52,25 @@ type WebsiteCreation struct {
 
 func (data *WebsiteCreation) Validate() error {
 	data.Path = strings.TrimSpace(data.Path)
+	if data.Name == "" {
+		return ErrNameCannotBeEmpty
+	}
+
 	if data.Path == "" {
 		return ErrPathCannotBeEmpty
-	}
-
-	if data.Limit <= 0 || data.Limit > 24 {
-		return ErrLimitInvalid
-	}
-
-	if data.Retry <= 0 || data.Retry > 24 {
-		return ErrRetryInvalid
 	}
 
 	data.Emails = strings.TrimSpace(data.Emails)
 	if data.Emails == "" {
 		return ErrEmailsCannotBeEmpty
+	}
+
+	if data.Limit <= 0 || data.Limit > 43200 {
+		return ErrLimitInvalid
+	}
+
+	if data.Retry <= 0 || data.Retry > 10 {
+		return ErrRetryInvalid
 	}
 
 	return nil
@@ -72,7 +79,8 @@ func (data *WebsiteCreation) Validate() error {
 func (WebsiteCreation) TableName() string { return Website{}.TableName() }
 
 type WebsiteUpdate struct {
-	Path   *string `json:"name" gorm:"column:name;"`
+	Name   *string `json:"name" gorm:"column:name;"`
+	Path   *string `json:"path" gorm:"column:path;"`
 	Limit  *int    `json:"limit" gorm:"column:limit;"`
 	Retry  *int    `json:"retry" gorm:"column:retry;"`
 	Emails *string `json:"emails" gorm:"column:emails;"`
@@ -86,9 +94,19 @@ type WebsiteUpdate struct {
 func (WebsiteUpdate) TableName() string { return Website{}.TableName() }
 
 func (data *WebsiteUpdate) Validate() error {
+	name := strings.TrimSpace(*data.Path)
+	if name == "" {
+		return ErrNameCannotBeEmpty
+	}
+
 	path := strings.TrimSpace(*data.Path)
 	if path == "" {
 		return ErrPathCannotBeEmpty
+	}
+
+	email := strings.TrimSpace(*data.Emails)
+	if email == "" {
+		return ErrEmailsCannotBeEmpty
 	}
 
 	limit := *data.Limit
@@ -99,11 +117,6 @@ func (data *WebsiteUpdate) Validate() error {
 	retry := *data.Retry
 	if retry <= 0 || retry > 24 {
 		return ErrRetryInvalid
-	}
-
-	email := strings.TrimSpace(*data.Emails)
-	if email == "" {
-		return ErrEmailsCannotBeEmpty
 	}
 
 	return nil

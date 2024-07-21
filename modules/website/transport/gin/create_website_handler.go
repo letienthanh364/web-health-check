@@ -22,9 +22,9 @@ func CreateWebsite(db *gorm.DB) func(ctx *gin.Context) {
 		}
 
 		store := storagewebsite.NewSqlStore(db)
-		business := bizwebsite.CreateWebsiteStorage(store)
+		business := bizwebsite.NewCreateWebsiteBiz(store)
 
-		if err := business.CreateWebsite(c.Request.Context(), &createData); err != nil {
+		if err := business.CreateNewWebsite(c.Request.Context(), &createData); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
