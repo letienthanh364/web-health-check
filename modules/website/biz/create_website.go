@@ -2,6 +2,7 @@ package bizwebsite
 
 import (
 	"context"
+	"github.com/teddlethal/web-health-check/appCommon"
 	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
 )
 
@@ -23,7 +24,7 @@ func (biz *createWebsiteBiz) CreateNewWebsite(ctx context.Context, data *modelwe
 	}
 
 	if err := biz.store.CreateWebsite(ctx, data); err != nil {
-		return err
+		return appCommon.ErrCannotCreateEntity(modelwebsite.EntityName, err)
 	}
 
 	return nil

@@ -72,7 +72,7 @@ func (lc *LinkChecker) checkLink(config Config) func() {
 			subject := "Link Down Notification"
 			msg := fmt.Sprintf("The link %s is down. Website: %s", config.Path, config.Name)
 			if err := appCommon.SendEmail(config.Emails, subject, msg); err != nil {
-				log.Printf("Failed to send email to %s: %v", config.Emails, err)
+				log.Printf("Failed to send contact to %s: %v", config.Emails, err)
 			}
 		}
 	}

@@ -11,22 +11,24 @@ const (
 )
 
 var (
-	ErrWebsiteIsDeleted    = errors.New("website is deleted")
-	ErrNameCannotBeEmpty   = errors.New("name cannot be empty")
-	ErrPathCannotBeEmpty   = errors.New("path cannot be empty")
-	ErrLimitInvalid        = errors.New("limit is invalid")
-	ErrRetryInvalid        = errors.New("retry is invalid")
-	ErrEmailsCannotBeEmpty = errors.New("emails cannot be empty")
+	ErrWebsiteIsDeleted           = errors.New("website is deleted")
+	ErrNameCannotBeEmpty          = errors.New("name cannot be empty")
+	ErrPathCannotBeEmpty          = errors.New("path cannot be empty")
+	ErrLimitInvalid               = errors.New("limit is invalid")
+	ErrRetryInvalid               = errors.New("retry is invalid")
+	ErrDefaultEmailCannotBeEmpty  = errors.New("default_email cannot be empty")
+	ErrContactLinkCannotBeEmpty   = errors.New("contact link cannot be empty")
+	ErrContactMethodCannotBeEmpty = errors.New("contact method cannot be empty")
 )
 
 type Website struct {
 	appCommon.SQLModel
-	Name   string `json:"name" gorm:"column:name;"`
-	Path   string `json:"path" gorm:"column:path;"`
-	Limit  int    `json:"limit" gorm:"column:limit;"`
-	Retry  int    `json:"retry" gorm:"column:retry;"`
-	Emails string `json:"emails" gorm:"column:emails;"`
-	Status string `json:"status" gorm:"column:status;"`
+	Name         string `json:"name" gorm:"column:name;"`
+	Path         string `json:"path" gorm:"column:path;"`
+	Limit        int    `json:"limit" gorm:"column:limit;"`
+	Retry        int    `json:"retry" gorm:"column:retry;"`
+	DefaultEmail string `json:"default_email" gorm:"column:default_email;"`
+	Status       string `json:"status" gorm:"column:status;"`
 	//Discords   []int `json:"discords"`
 	//Facebooks  []int `json:"facebooks"`
 	//Phones     []int `json:"phones"`
@@ -38,12 +40,12 @@ func (Website) TableName() string {
 }
 
 type WebsiteCreation struct {
-	Id     int    `json:"id" gorm:"column:id;"`
-	Name   string `json:"name" gorm:"column:name;"`
-	Path   string `json:"path" gorm:"column:path;"`
-	Limit  int    `json:"limit" gorm:"column:limit;"`
-	Retry  int    `json:"retry" gorm:"column:retry;"`
-	Emails string `json:"emails" gorm:"column:emails;"`
+	Id           int    `json:"id" gorm:"column:id;"`
+	Name         string `json:"name" gorm:"column:name;"`
+	Path         string `json:"path" gorm:"column:path;"`
+	Limit        int    `json:"limit" gorm:"column:limit;"`
+	Retry        int    `json:"retry" gorm:"column:retry;"`
+	DefaultEmail string `json:"default_email" gorm:"column:default_email;"`
 	//Discords   string `json:"discords,omitempty" gorm:"column:discords;"`
 	//Facebooks  string `json:"facebooks,omitempty" gorm:"column:facebooks;"`
 	//Phones     string `json:"phones,omitempty" gorm:"column:phones;"`
@@ -56,13 +58,14 @@ func (data *WebsiteCreation) Validate() error {
 		return ErrNameCannotBeEmpty
 	}
 
+	data.Path = strings.TrimSpace(data.Path)
 	if data.Path == "" {
 		return ErrPathCannotBeEmpty
 	}
 
-	data.Emails = strings.TrimSpace(data.Emails)
-	if data.Emails == "" {
-		return ErrEmailsCannotBeEmpty
+	data.DefaultEmail = strings.TrimSpace(data.DefaultEmail)
+	if data.DefaultEmail == "" {
+		return ErrDefaultEmailCannotBeEmpty
 	}
 
 	if data.Limit <= 0 || data.Limit > 43200 {
@@ -79,12 +82,12 @@ func (data *WebsiteCreation) Validate() error {
 func (WebsiteCreation) TableName() string { return Website{}.TableName() }
 
 type WebsiteUpdate struct {
-	Name   *string `json:"name" gorm:"column:name;"`
-	Path   *string `json:"path" gorm:"column:path;"`
-	Limit  *int    `json:"limit" gorm:"column:limit;"`
-	Retry  *int    `json:"retry" gorm:"column:retry;"`
-	Emails *string `json:"emails" gorm:"column:emails;"`
-	Status *string `json:"status" gorm:"column:status;"`
+	Name         *string `json:"name" gorm:"column:name;"`
+	Path         *string `json:"path" gorm:"column:path;"`
+	Limit        *int    `json:"limit" gorm:"column:limit;"`
+	Retry        *int    `json:"retry" gorm:"column:retry;"`
+	DefaultEmail *string `json:"default_email" gorm:"column:default_email;"`
+	Status       *string `json:"status" gorm:"column:status;"`
 	//Discords   *string `json:"discords" gorm:"column:discords;"`
 	//Facebooks  *string `json:"facebooks" gorm:"column:facebooks;"`
 	//Phones     *string `json:"phones" gorm:"column:phones;"`
@@ -104,9 +107,9 @@ func (data *WebsiteUpdate) Validate() error {
 		return ErrPathCannotBeEmpty
 	}
 
-	email := strings.TrimSpace(*data.Emails)
+	email := strings.TrimSpace(*data.DefaultEmail)
 	if email == "" {
-		return ErrEmailsCannotBeEmpty
+		return ErrDefaultEmailCannotBeEmpty
 	}
 
 	limit := *data.Limit

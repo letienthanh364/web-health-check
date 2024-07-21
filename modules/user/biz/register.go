@@ -28,7 +28,7 @@ func NewRegisterBiz(storage RegisterStorage, hasher Hasher) *registerBiz {
 }
 
 func (biz *registerBiz) Register(ctx context.Context, data *usermodel.UserCreate) error {
-	user, _ := biz.registerStorage.FindUser(ctx, map[string]interface{}{"email": data.Email})
+	user, _ := biz.registerStorage.FindUser(ctx, map[string]interface{}{"contact": data.Email})
 
 	if user != nil {
 		return usermodel.ErrEmailExisted

@@ -2,6 +2,7 @@ package bizwebsite
 
 import (
 	"context"
+	"github.com/teddlethal/web-health-check/appCommon"
 	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
 )
 
@@ -22,7 +23,7 @@ func (biz *deleteWebsiteBiz) DeleteWebsiteById(ctx context.Context, configId int
 	data, err := biz.store.GetWebsite(ctx, map[string]interface{}{"id": configId})
 
 	if err != nil {
-		return err
+		return appCommon.ErrCannotGetEntity(modelwebsite.EntityName, err)
 	}
 
 	if data.Status == "deleted" {
@@ -30,7 +31,7 @@ func (biz *deleteWebsiteBiz) DeleteWebsiteById(ctx context.Context, configId int
 	}
 
 	if err := biz.store.DeleteWebsite(ctx, map[string]interface{}{"id": configId}); err != nil {
-		return err
+		return appCommon.ErrCannotDeleteEntity(modelwebsite.EntityName, err)
 	}
 
 	return nil

@@ -31,7 +31,7 @@ func (biz *listWebsiteBiz) ListWebsite(ctx context.Context,
 	data, err := biz.store.ListWebsite(ctx, filter, paging)
 
 	if err != nil {
-		return nil, err
+		return nil, appCommon.ErrCannotListEntity(modelwebsite.EntityName, err)
 	}
 
 	return data, nil

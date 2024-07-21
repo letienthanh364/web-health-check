@@ -2,6 +2,7 @@ package bizwebsite
 
 import (
 	"context"
+	"github.com/teddlethal/web-health-check/appCommon"
 	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
 )
 
@@ -18,10 +19,10 @@ func NewUpdateWebsiteBiz(store UpdateWebsiteStorage) *updateWebsiteBiz {
 	return &updateWebsiteBiz{store: store}
 }
 
-func (biz *updateWebsiteBiz) UpdateWebsite(ctx context.Context, configId int, updateData *modelwebsite.WebsiteUpdate) error {
-	data, err := biz.store.GetWebsite(ctx, map[string]interface{}{"id": configId})
+func (biz *updateWebsiteBiz) UpdateWebsite(ctx context.Context, websiteId int, updateData *modelwebsite.WebsiteUpdate) error {
+	data, err := biz.store.GetWebsite(ctx, map[string]interface{}{"id": websiteId})
 	if err != nil {
-		return err
+		return appCommon.ErrCannotGetEntity(modelwebsite.EntityName, err)
 	}
 
 	if data.Status == "deleted" {
@@ -32,8 +33,8 @@ func (biz *updateWebsiteBiz) UpdateWebsite(ctx context.Context, configId int, up
 		return err
 	}
 
-	if err := biz.store.UpdateWebsite(ctx, map[string]interface{}{"id": configId}, updateData); err != nil {
-		return err
+	if err := biz.store.UpdateWebsite(ctx, map[string]interface{}{"id": websiteId}, updateData); err != nil {
+		return appCommon.ErrCannotUpdateEntity(modelwebsite.EntityName, err)
 	}
 
 	return nil

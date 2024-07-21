@@ -37,10 +37,9 @@ func main() {
 		v1.POST("/register", ginuser.Register(db))
 		v1.POST("/login", ginuser.Login(db, tokenProvider))
 	}
-	routes.ConfigRoutes(v1, db, middlewareAuth)
 	routes.CustomerRoutes(v1, db, middlewareAuth)
 	routes.WebsiteRoutes(v1, db, middlewareAuth)
-	routes.EmailRoutes(v1, db, middlewareAuth)
+	routes.ContactRoutes(v1, db, middlewareAuth)
 	routes.CheckerRoutes(v1)
 
 	r.GET("/ping", func(c *gin.Context) {

@@ -31,7 +31,7 @@ func FetchWebsites(db *gorm.DB) []Config {
 			Path:   website.Path,
 			Limit:  website.Limit,
 			Retry:  website.Retry,
-			Emails: website.Emails,
+			Emails: website.DefaultEmail,
 			Status: website.Status,
 		}
 		configs = append(configs, config)

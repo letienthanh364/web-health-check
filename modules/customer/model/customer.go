@@ -9,7 +9,7 @@ import (
 var (
 	ErrWebsiteIdCannotBeEmpty     = errors.New("website id cannot be empty")
 	ErrNameCannotBeEmpty          = errors.New("name cannot be empty")
-	ErrEmailCannotBeEmpty         = errors.New("email cannot be empty")
+	ErrEmailCannotBeEmpty         = errors.New("contact cannot be empty")
 	ErrPhoneCannotBeEmpty         = errors.New("phone cannot be empty")
 	ErrContactMethodCannotBeEmpty = errors.New("contact method cannot be empty")
 	ErrLinkCannotBeEmpty          = errors.New("link cannot be empty")
@@ -25,7 +25,7 @@ type Customer struct {
 	appCommon.SQLModel
 	WebsiteId     int    `json:"website_id" gorm:"column:website_id;"`
 	Name          string `json:"name" gorm:"column:name;"`
-	Email         string `json:"email" gorm:"column:email;"`
+	Email         string `json:"contact" gorm:"column:contact;"`
 	Phone         string `json:"phone" gorm:"column:phone;"`
 	ContactMethod string `json:"contact_method" gorm:"column:contact_method;"`
 	Link          string `json:"link" gorm:"column:link;"`
@@ -40,7 +40,7 @@ type CustomerCreate struct {
 	Id            int    `json:"id" gorm:"column:id;"`
 	WebsiteId     int    `json:"website_id,omitempty" gorm:"column:website_id;"`
 	Name          string `json:"name" gorm:"column:name;"`
-	Email         string `json:"email" gorm:"column:email;"`
+	Email         string `json:"contact" gorm:"column:contact;"`
 	Phone         string `json:"phone" gorm:"column:phone;"`
 	ContactMethod string `json:"contact_method" gorm:"column:contact_method;"`
 	Link          string `json:"link" gorm:"column:link;"`
@@ -84,7 +84,7 @@ type CustomerUpdate struct {
 	Status        *string `json:"status" gorm:"column:status;"`
 	WebsiteId     *int    `json:"website_id" gorm:"column:website_id;"`
 	Name          *string `json:"name" gorm:"column:name;"`
-	Email         *string `json:"email" gorm:"column:email;"`
+	Email         *string `json:"contact" gorm:"column:contact;"`
 	Phone         *string `json:"phone" gorm:"column:phone;"`
 	ContactMethod *string `json:"contact_method" gorm:"column:contact_method;"`
 	Link          *string `json:"link" gorm:"column:link;"`

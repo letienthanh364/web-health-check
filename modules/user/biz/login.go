@@ -28,7 +28,7 @@ func NewLoginBiz(storeUser LoginStorage, tokenProvider tokenprovider.Provider, h
 }
 
 func (biz *loginBiz) Login(ctx context.Context, data *usermodel.UserLogin) (tokenprovider.Token, error) {
-	user, err := biz.storeUser.FindUser(ctx, map[string]interface{}{"email": data.Email})
+	user, err := biz.storeUser.FindUser(ctx, map[string]interface{}{"contact": data.Email})
 
 	if err != nil {
 		return nil, usermodel.ErrEmailOrPasswordInvalid

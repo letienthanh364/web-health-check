@@ -14,5 +14,13 @@ func WebsiteRoutes(router *gin.RouterGroup, db *gorm.DB, middleware func(c *gin.
 		items.GET("/:id", ginwebsite.GetWebsiteById(db))
 		items.PATCH("/:id", ginwebsite.UpdateWebsite(db))
 		items.DELETE("/:id", ginwebsite.DeleteWebsite(db))
+
+		contacts := items.Group("/contact")
+		{
+			contacts.POST("/:id", ginwebsite.AddContactForWebsite(db))
+			contacts.GET("/:id", ginwebsite.ListContactsForWebsite(db))
+
+		}
 	}
+
 }

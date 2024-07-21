@@ -8,8 +8,8 @@ import (
 func SendEmail(to string, subject string, body string) error {
 	password := os.Getenv("GO_SMTP_PWD")
 
-	from := "letienthanh030604@gmail.com" // replace with your email
-	//password := "ebuf jcyp nqij ttyn" // replace with your email password
+	from := "letienthanh030604@gmail.com" // replace with your contact
+	//password := "ebuf jcyp nqij ttyn" // replace with your contact password
 
 	smtpHost := "smtp.gmail.com" // Gmail SMTP host
 	smtpPort := "587"            // Gmail SMTP port for TLS
