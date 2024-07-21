@@ -51,7 +51,7 @@ type WebsiteCreation struct {
 }
 
 func (data *WebsiteCreation) Validate() error {
-	data.Path = strings.TrimSpace(data.Path)
+	data.Name = strings.TrimSpace(data.Name)
 	if data.Name == "" {
 		return ErrNameCannotBeEmpty
 	}
