@@ -9,7 +9,7 @@ import (
 )
 
 // FetchWebsites fetches the list of websites from the database
-func FetchWebsites(db *gorm.DB) []Config {
+func FetchWebsites(db *gorm.DB) []WebConfig {
 	websiteStore := storagewebsite.NewSqlStore(db)
 
 	var queryString struct {
@@ -24,14 +24,15 @@ func FetchWebsites(db *gorm.DB) []Config {
 		log.Fatalf("Failed to fetch websites: %v", err)
 	}
 
-	var configs []Config
+	var configs []WebConfig
 	for _, website := range websites {
-		config := Config{
+		config := WebConfig{
+			WebId:  website.Id,
 			Name:   website.Name,
 			Path:   website.Path,
 			Limit:  website.Limit,
 			Retry:  website.Retry,
-			Emails: website.DefaultEmail,
+			Email:  website.DefaultEmail,
 			Status: website.Status,
 		}
 		configs = append(configs, config)

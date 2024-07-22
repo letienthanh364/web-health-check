@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/component/tokenprovider/jwt"
+	"github.com/teddlethal/web-health-check/linkchecker"
 	"github.com/teddlethal/web-health-check/middleware"
 	storageuser "github.com/teddlethal/web-health-check/modules/user/storage"
 	ginuser "github.com/teddlethal/web-health-check/modules/user/transport/gin"
@@ -48,15 +49,14 @@ func main() {
 		})
 	})
 
-	// Set up the website business logic
+	//Set up the website business logic
+	//Fetch the list of websites and start the link checker
+	configs := linkchecker.FetchWebsites(db)
+	lc := linkchecker.NewLinkChecker(configs)
+	lc.Start(db)
 
-	// Fetch the list of websites and start the link checker
-	//configs := linkchecker.FetchWebsites(db)
-	//lc := linkchecker.NewLinkChecker(configs)
-	//lc.Start()
-	//
-	//// Ensure the cron job is stopped gracefully on program exit
-	//defer lc.Stop()
+	// Ensure the cron job is stopped gracefully on program exit
+	defer lc.Stop()
 
 	errRun := r.Run(":2000")
 

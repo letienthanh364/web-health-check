@@ -3,32 +3,25 @@ package linkchecker
 
 import (
 	"fmt"
+	"github.com/robfig/cron/v3"
 	"github.com/teddlethal/web-health-check/appCommon"
 	"github.com/teddlethal/web-health-check/checker"
+	modelcontact "github.com/teddlethal/web-health-check/modules/contact/model"
+	storageemail "github.com/teddlethal/web-health-check/modules/contact/storage"
+	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
+	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
+	"gorm.io/gorm"
 	"log"
 	"time"
-
-	"github.com/robfig/cron/v3"
 )
 
-// Config holds the configuration for the LinkChecker
-type Config struct {
-	Name   string
-	Path   string
-	Limit  int
-	Retry  int
-	Emails string
-	Status string
-}
-
-// LinkChecker holds the cron job instance
 type LinkChecker struct {
-	configs []Config
+	configs []WebConfig
 	cron    *cron.Cron
 }
 
 // NewLinkChecker initializes and returns a new LinkChecker with given configurations
-func NewLinkChecker(configs []Config) *LinkChecker {
+func NewLinkChecker(configs []WebConfig) *LinkChecker {
 	return &LinkChecker{
 		configs: configs,
 		cron:    cron.New(),
@@ -36,12 +29,12 @@ func NewLinkChecker(configs []Config) *LinkChecker {
 }
 
 // Start begins the cron job to check links at regular intervals
-func (lc *LinkChecker) Start() {
+func (lc *LinkChecker) Start(db *gorm.DB) {
+	log.Println(lc.configs)
+
 	for _, config := range lc.configs {
-		log.Printf("%d", config.Limit)
 		interval := "@every " + time.Duration((24*3600*1e9)/config.Limit).String()
-		log.Print(interval)
-		lc.cron.AddFunc(interval, lc.checkLink(config))
+		lc.cron.AddFunc(interval, lc.checkLink(config, db))
 	}
 	lc.cron.Start()
 }
@@ -52,7 +45,7 @@ func (lc *LinkChecker) Stop() {
 }
 
 // checkLink checks the link for a given configuration
-func (lc *LinkChecker) checkLink(config Config) func() {
+func (lc *LinkChecker) checkLink(config WebConfig, db *gorm.DB) func() {
 	return func() {
 		status := "alive"
 		for i := 0; i < config.Retry; i++ {
@@ -69,11 +62,42 @@ func (lc *LinkChecker) checkLink(config Config) func() {
 			}
 		}
 		if status == "dead" {
-			subject := "Link Down Notification"
-			msg := fmt.Sprintf("The link %s is down. Website: %s", config.Path, config.Name)
-			if err := appCommon.SendEmail(config.Emails, subject, msg); err != nil {
-				log.Printf("Failed to send contact to %s: %v", config.Emails, err)
+			websiteStorage := storagewebsite.NewSqlStore(db)
+			emailStorage := storageemail.NewSqlStore(db)
+			business := bizwebsite.NewListContactsForWebsiteBiz(websiteStorage, emailStorage)
+			res, err := business.ListContactsForWebsite(nil, config.WebId, &modelcontact.Filter{}, &appCommon.Paging{
+				Page:  1,
+				Limit: 100,
+			})
+			if err != nil {
+				log.Printf("Failed to get contact list for website %s: %v", config.Name, err)
+				return
 			}
+
+			for _, contact := range res {
+				switch contact.ContactMethod {
+				case "email":
+					subject := "Link Down Notification"
+					msg := fmt.Sprintf("The link %s is down. Website: %s", config.Path, config.Name)
+					if err := appCommon.SendEmail(contact.ContactAddress, subject, msg); err != nil {
+						log.Printf("Failed to sended contact to %s: %v", config.Email, err)
+					}
+					log.Printf("Sucessfully sended notifacation to address: %s, method: %s.", contact.ContactAddress, contact.ContactMethod)
+
+				case "discord":
+					log.Printf("Sucessfully send notifacation to address: %s, method: %s.", contact.ContactAddress, contact.ContactMethod)
+
+				default:
+					log.Printf("Invalid method contact: %s.", contact.ContactMethod)
+				}
+			}
+
+			//subject := "Link Down Notification"
+			//msg := fmt.Sprintf("The link %s is down. Website: %s", config.Path, config.Name)
+			//
+			//if err := appCommon.SendEmail(config.Email, subject, msg); err != nil {
+			//	log.Printf("Failed to send contact to %s: %v", config.Email, err)
+			//}
 		}
 	}
 }

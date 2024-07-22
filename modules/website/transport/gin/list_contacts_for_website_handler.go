@@ -3,8 +3,8 @@ package ginwebsite
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/appCommon"
-	modelemail "github.com/teddlethal/web-health-check/modules/contact/model"
-	storageemail "github.com/teddlethal/web-health-check/modules/contact/storage"
+	modelcontact "github.com/teddlethal/web-health-check/modules/contact/model"
+	storagecontact "github.com/teddlethal/web-health-check/modules/contact/storage"
 	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
 	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
 	"gorm.io/gorm"
@@ -16,7 +16,7 @@ func ListContactsForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 		var queryString struct {
 			appCommon.Paging
-			modelemail.Filter
+			modelcontact.Filter
 		}
 
 		id, err := strconv.Atoi(c.Param("id"))
@@ -28,8 +28,8 @@ func ListContactsForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 		}
 
 		websiteStorage := storagewebsite.NewSqlStore(db)
-		emailStorage := storageemail.NewSqlStore(db)
-		business := bizwebsite.NewListContactsForWebsiteBiz(websiteStorage, emailStorage)
+		contactStorage := storagecontact.NewSqlStore(db)
+		business := bizwebsite.NewListContactsForWebsiteBiz(websiteStorage, contactStorage)
 
 		res, err := business.ListContactsForWebsite(c.Request.Context(), id, &queryString.Filter, &queryString.Paging)
 		if err != nil {
