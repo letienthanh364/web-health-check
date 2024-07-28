@@ -12,7 +12,7 @@ type AppError struct {
 	RootErr    error  `json:"-"`
 	Message    string `json:"message"`
 	Log        string `json:"log"`
-	Key        string `json:"key"`
+	ErrorKey   string `json:"error_key"`
 }
 
 func NewErrorResponse(root error, msg, log, key string) *AppError {
@@ -21,7 +21,7 @@ func NewErrorResponse(root error, msg, log, key string) *AppError {
 		RootErr:    root,
 		Message:    msg,
 		Log:        log,
-		Key:        key,
+		ErrorKey:   key,
 	}
 }
 
@@ -42,7 +42,7 @@ func NewFullErrorResponse(statusCode int, root error, msg, log, key string) *App
 		RootErr:    root,
 		Message:    msg,
 		Log:        log,
-		Key:        key,
+		ErrorKey:   key,
 	}
 }
 
@@ -51,7 +51,7 @@ func NewUnauthorized(root error, msg, key string) *AppError {
 		StatusCode: http.StatusUnauthorized,
 		RootErr:    root,
 		Message:    msg,
-		Key:        key,
+		ErrorKey:   key,
 	}
 }
 

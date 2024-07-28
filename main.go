@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/component/tokenprovider/jwt"
 	"github.com/teddlethal/web-health-check/linkchecker"
@@ -13,6 +14,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
@@ -31,6 +33,19 @@ func main() {
 	log.Println("DB Connection: ", db)
 
 	r := gin.Default()
+
+	// Configure CORS middleware
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	r.Use(middleware.Recover())
+
 	r.Use(middleware.Recover())
 
 	v1 := r.Group("/v1")
@@ -52,7 +67,10 @@ func main() {
 	//Set up the website business logic
 	//Fetch the list of websites and start the link checker
 	configs := linkchecker.FetchWebsites(db)
-	lc := linkchecker.NewLinkChecker(configs)
+	alertEmail := "letienthanh364@gmail.com"
+	checkInterval := 10 * time.Minute
+	alertThreshold := 30 * time.Minute
+	lc := linkchecker.NewLinkChecker(configs, alertEmail, checkInterval, alertThreshold)
 	lc.Start(db)
 
 	// Ensure the cron job is stopped gracefully on program exit

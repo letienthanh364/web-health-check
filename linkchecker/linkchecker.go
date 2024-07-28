@@ -2,7 +2,6 @@
 package linkchecker
 
 import (
-	"fmt"
 	"github.com/robfig/cron/v3"
 	"github.com/teddlethal/web-health-check/appCommon"
 	"github.com/teddlethal/web-health-check/checker"
@@ -16,12 +15,16 @@ import (
 )
 
 type LinkChecker struct {
-	configs []WebConfig
-	cron    *cron.Cron
+	configs        []WebConfig
+	cron           *cron.Cron
+	lastCheckTime  time.Time
+	alertEmail     string
+	checkInterval  time.Duration
+	alertThreshold time.Duration
 }
 
 // NewLinkChecker initializes and returns a new LinkChecker with given configurations
-func NewLinkChecker(configs []WebConfig) *LinkChecker {
+func NewLinkChecker(configs []WebConfig, alertEmail string, checkInterval, alertThreshold time.Duration) *LinkChecker {
 	return &LinkChecker{
 		configs: configs,
 		cron:    cron.New(),
@@ -53,8 +56,6 @@ func (lc *LinkChecker) checkLink(config WebConfig, db *gorm.DB) func() {
 			status = "alive"
 			if isDead {
 				status = "dead"
-			} else {
-				break
 			}
 			log.Printf("Website: %s, URL: %s, Status: %s\n", config.Name, config.Path, status)
 			if status == "alive" {
@@ -65,39 +66,27 @@ func (lc *LinkChecker) checkLink(config WebConfig, db *gorm.DB) func() {
 			websiteStorage := storagewebsite.NewSqlStore(db)
 			emailStorage := storageemail.NewSqlStore(db)
 			business := bizwebsite.NewListContactsForWebsiteBiz(websiteStorage, emailStorage)
-			res, err := business.ListContactsForWebsite(nil, config.WebId, &modelcontact.Filter{}, &appCommon.Paging{
+			contacts, err := business.ListContactsForWebsite(nil, config.WebId, &modelcontact.Filter{}, &appCommon.Paging{
 				Page:  1,
 				Limit: 100,
 			})
 			if err != nil {
 				log.Printf("Failed to get contact list for website %s: %v", config.Name, err)
-				return
 			}
 
-			for _, contact := range res {
-				switch contact.ContactMethod {
-				case "email":
-					subject := "Link Down Notification"
-					msg := fmt.Sprintf("The link %s is down. Website: %s", config.Path, config.Name)
-					if err := appCommon.SendEmail(contact.ContactAddress, subject, msg); err != nil {
-						log.Printf("Failed to sended contact to %s: %v", config.Email, err)
-					}
-					log.Printf("Sucessfully sended notifacation to address: %s, method: %s.", contact.ContactAddress, contact.ContactMethod)
+			SendNotifications(contacts, config)
 
-				case "discord":
-					log.Printf("Sucessfully send notifacation to address: %s, method: %s.", contact.ContactAddress, contact.ContactMethod)
+		}
+		lc.lastCheckTime = time.Now()
+	}
+}
 
-				default:
-					log.Printf("Invalid method contact: %s.", contact.ContactMethod)
-				}
-			}
-
-			//subject := "Link Down Notification"
-			//msg := fmt.Sprintf("The link %s is down. Website: %s", config.Path, config.Name)
-			//
-			//if err := appCommon.SendEmail(config.Email, subject, msg); err != nil {
-			//	log.Printf("Failed to send contact to %s: %v", config.Email, err)
-			//}
+func (lc *LinkChecker) selfCheck() {
+	if time.Since(lc.lastCheckTime) > lc.alertThreshold {
+		subject := "Health-Check Service Alert"
+		body := "The health-check service has not performed checks for the configured threshold period."
+		if err := appCommon.SendEmail(lc.alertEmail, subject, body); err != nil {
+			log.Printf("Failed to send self-check alert email to %s: %v", lc.alertEmail, err)
 		}
 	}
 }

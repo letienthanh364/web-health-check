@@ -55,6 +55,7 @@ type WebsiteCreation struct {
 func (data *WebsiteCreation) Validate() error {
 	data.Name = strings.TrimSpace(data.Name)
 	if data.Name == "" {
+
 		return ErrNameCannotBeEmpty
 	}
 
@@ -88,38 +89,44 @@ type WebsiteUpdate struct {
 	Retry        *int    `json:"retry" gorm:"column:retry;"`
 	DefaultEmail *string `json:"default_email" gorm:"column:default_email;"`
 	Status       *string `json:"status" gorm:"column:status;"`
-	//Discords   *string `json:"discords" gorm:"column:discords;"`
-	//Facebooks  *string `json:"facebooks" gorm:"column:facebooks;"`
-	//Phones     *string `json:"phones" gorm:"column:phones;"`
-	//OtherLinks *string `json:"other_links" gorm:"column:other_links;"`
 }
 
 func (WebsiteUpdate) TableName() string { return Website{}.TableName() }
 
 func (data *WebsiteUpdate) Validate() error {
-	name := strings.TrimSpace(*data.Path)
-	if name == "" {
-		return ErrNameCannotBeEmpty
+	if data.Name != nil {
+		name := strings.TrimSpace(*data.Name)
+		if name == "" {
+			return ErrNameCannotBeEmpty
+		}
 	}
 
-	path := strings.TrimSpace(*data.Path)
-	if path == "" {
-		return ErrPathCannotBeEmpty
+	if data.Path != nil {
+		path := strings.TrimSpace(*data.Path)
+		if path == "" {
+			return ErrPathCannotBeEmpty
+		}
 	}
 
-	email := strings.TrimSpace(*data.DefaultEmail)
-	if email == "" {
-		return ErrDefaultEmailCannotBeEmpty
+	if data.DefaultEmail != nil {
+		email := strings.TrimSpace(*data.DefaultEmail)
+		if email == "" {
+			return ErrDefaultEmailCannotBeEmpty
+		}
 	}
 
-	limit := *data.Limit
-	if limit <= 0 || limit > 24 {
-		return ErrLimitInvalid
+	if data.Limit != nil {
+		limit := *data.Limit
+		if limit <= 0 || limit > 24 {
+			return ErrLimitInvalid
+		}
 	}
 
-	retry := *data.Retry
-	if retry <= 0 || retry > 24 {
-		return ErrRetryInvalid
+	if data.Retry != nil {
+		retry := *data.Retry
+		if retry <= 0 || retry > 24 {
+			return ErrRetryInvalid
+		}
 	}
 
 	return nil
