@@ -29,14 +29,20 @@ type Website struct {
 	Retry        int    `json:"retry" gorm:"column:retry;"`
 	DefaultEmail string `json:"default_email" gorm:"column:default_email;"`
 	Status       string `json:"status" gorm:"column:status;"`
-	//Discords   []int `json:"discords"`
-	//Facebooks  []int `json:"facebooks"`
-	//Phones     []int `json:"phones"`
-	//OtherLinks []int `json:"other_links"`
 }
 
 func (Website) TableName() string {
 	return "websites"
+}
+
+type WebsiteDetail struct {
+	appCommon.SQLModel
+	Name         string `json:"name" gorm:"column:name;"`
+	Path         string `json:"path" gorm:"column:path;"`
+	Limit        int    `json:"limit" gorm:"column:limit;"`
+	Retry        int    `json:"retry" gorm:"column:retry;"`
+	DefaultEmail string `json:"default_email" gorm:"column:default_email;"`
+	Status       string `json:"status" gorm:"column:status;"`
 }
 
 type WebsiteCreation struct {
@@ -46,10 +52,6 @@ type WebsiteCreation struct {
 	Limit        int    `json:"limit" gorm:"column:limit;"`
 	Retry        int    `json:"retry" gorm:"column:retry;"`
 	DefaultEmail string `json:"default_email" gorm:"column:default_email;"`
-	//Discords   string `json:"discords,omitempty" gorm:"column:discords;"`
-	//Facebooks  string `json:"facebooks,omitempty" gorm:"column:facebooks;"`
-	//Phones     string `json:"phones,omitempty" gorm:"column:phones;"`
-	//OtherLinks string `json:"other_links,omitempty" gorm:"column:other_links;"`
 }
 
 func (data *WebsiteCreation) Validate() error {

@@ -58,6 +58,7 @@ func (biz *listContactsForWebsiteBiz) ListContactsForWebsite(ctx context.Context
 	var res []modelwebsite.WebsiteContact
 	for _, c := range contactList {
 		contact := modelwebsite.WebsiteContact{
+			Id:             c.Id,
 			ContactAddress: c.Address,
 			ContactMethod:  c.ContactMethod,
 		}

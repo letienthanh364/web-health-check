@@ -21,6 +21,14 @@ func WebsiteRoutes(router *gin.RouterGroup, db *gorm.DB, middleware func(c *gin.
 			contacts.GET("/:id", ginwebsite.ListContactsForWebsite(db))
 
 		}
+
+		checktimes := items.Group("/checktime")
+		{
+			checktimes.POST("/:id", ginwebsite.AddCheckTimeForWebsite(db))
+			checktimes.GET("/:id", ginwebsite.ListCheckTimesForWebsite(db))
+			checktimes.DELETE("/:id", ginwebsite.DeleteCheckTimeForWebsite(db))
+
+		}
 	}
 
 }

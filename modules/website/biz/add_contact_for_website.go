@@ -6,11 +6,6 @@ import (
 	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
 )
 
-type AddContactStorage interface {
-	GetWebsite(ctx context.Context, cond map[string]interface{}) (*modelwebsite.Website, error)
-	UpdateWebsite(ctx context.Context, cond map[string]interface{}, updateData *modelwebsite.WebsiteUpdate) error
-}
-
 type CreateContactStorage interface {
 	CreateContact(ctx context.Context, data *modelcontact.ContactCreation) error
 }

@@ -1,0 +1,36 @@
+package modelwebsite
+
+import (
+	"errors"
+	"strings"
+)
+
+var (
+	ErrCheckTimeCannotBeEmpty = errors.New("check time cannot be empty")
+)
+
+type WebsiteCheckTime struct {
+	Id        int    `json:"id" gorm:"column:id;"`
+	WebsiteId int    `json:"website_id" gorm:"column:website_id;"`
+	CheckTime string `json:"check_time" gorm:"column:check_time;"`
+}
+
+func (WebsiteCheckTime) TableName() string {
+	return "website_checktimes"
+}
+
+type WebsiteCheckTimeCreation struct {
+	WebsiteId int    `json:"website_id" gorm:"column:website_id;"`
+	CheckTime string `json:"check_time" gorm:"column:check_time;"`
+}
+
+func (WebsiteCheckTimeCreation) TableName() string { return WebsiteCheckTime{}.TableName() }
+
+func (data *WebsiteCheckTimeCreation) Validate() error {
+	data.CheckTime = strings.TrimSpace(data.CheckTime)
+	if data.CheckTime == "" {
+		return ErrCheckTimeCannotBeEmpty
+	}
+
+	return nil
+}

@@ -3,6 +3,7 @@ package modelwebsite
 import "strings"
 
 type WebsiteContact struct {
+	Id             int    `json:"id"`
 	ContactAddress string `json:"contact_address"`
 	ContactMethod  string `json:"contact_method"`
 }

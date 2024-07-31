@@ -3,20 +3,19 @@ package ginwebsite
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/appCommon"
-	modelcontact "github.com/teddlethal/web-health-check/modules/contact/model"
-	storagecontact "github.com/teddlethal/web-health-check/modules/contact/storage"
 	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
+	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
 	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
 
-func ListContactsForWebsite(db *gorm.DB) func(ctx *gin.Context) {
+func ListCheckTimesForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 		var queryString struct {
 			appCommon.Paging
-			modelcontact.Filter
+			modelwebsite.WebsiteCheckTimeFilter
 		}
 
 		id, err := strconv.Atoi(c.Param("id"))
@@ -28,10 +27,9 @@ func ListContactsForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 		}
 
 		websiteStorage := storagewebsite.NewSqlStore(db)
-		contactStorage := storagecontact.NewSqlStore(db)
-		business := bizwebsite.NewListContactsForWebsiteBiz(websiteStorage, contactStorage)
+		business := bizwebsite.NewListCheckTimesForWebsiteBiz(websiteStorage)
 
-		res, err := business.ListContactsForWebsite(c.Request.Context(), id, &queryString.Filter, &queryString.Paging)
+		res, err := business.ListCheckTimesForWebsite(c.Request.Context(), id, &queryString.WebsiteCheckTimeFilter, &queryString.Paging)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),

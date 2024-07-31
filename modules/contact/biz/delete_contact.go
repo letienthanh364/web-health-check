@@ -19,8 +19,8 @@ func NewDeleteContactBiz(store DeleteContactStorage) *deleteContactBiz {
 	return &deleteContactBiz{store: store}
 }
 
-func (biz *deleteContactBiz) DeleteEmailById(ctx context.Context, configId int) error {
-	data, err := biz.store.GetContact(ctx, map[string]interface{}{"id": configId})
+func (biz *deleteContactBiz) DeleteEmailById(ctx context.Context, id int) error {
+	data, err := biz.store.GetContact(ctx, map[string]interface{}{"id": id})
 
 	if err != nil {
 		return appCommon.ErrCannotGetEntity(modelcontact.EntityName, err)
@@ -30,7 +30,7 @@ func (biz *deleteContactBiz) DeleteEmailById(ctx context.Context, configId int) 
 		return modelcontact.ErrContactIsDeleted
 	}
 
-	if err := biz.store.DeleteContact(ctx, map[string]interface{}{"id": configId}); err != nil {
+	if err := biz.store.DeleteContact(ctx, map[string]interface{}{"id": id}); err != nil {
 		return appCommon.ErrCannotDeleteEntity(modelcontact.EntityName, err)
 	}
 
