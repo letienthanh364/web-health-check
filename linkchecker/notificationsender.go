@@ -15,7 +15,7 @@ func SendNotifications(contacts []modelwebsite.WebsiteContact, config WebConfig)
 			subject := "Link Down Notification"
 			msg := fmt.Sprintf("The link %s is down. Website: %s", config.Path, config.Name)
 			if err := appCommon.SendEmail(contactAddress, subject, msg); err != nil {
-				log.Printf("Failed to sended contact to %s: %v", config.Email, err)
+				log.Printf("Failed to sended contact to %s: %v", config.DefaultEmail, err)
 			}
 			log.Printf("Sucessfully sended notifacation to address: %s, method: %s.", contact.ContactAddress, contact.ContactMethod)
 

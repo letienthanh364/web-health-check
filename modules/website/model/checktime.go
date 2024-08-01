@@ -27,8 +27,8 @@ type WebsiteCheckTimeCreation struct {
 func (WebsiteCheckTimeCreation) TableName() string { return WebsiteCheckTime{}.TableName() }
 
 func (data *WebsiteCheckTimeCreation) Validate() error {
-	data.CheckTime = strings.TrimSpace(data.CheckTime)
-	if data.CheckTime == "" {
+	checktime := strings.TrimSpace(data.CheckTime)
+	if checktime == "" {
 		return ErrCheckTimeCannotBeEmpty
 	}
 

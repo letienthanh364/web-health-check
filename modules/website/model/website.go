@@ -25,7 +25,7 @@ type Website struct {
 	appCommon.SQLModel
 	Name         string `json:"name" gorm:"column:name;"`
 	Path         string `json:"path" gorm:"column:path;"`
-	Limit        int    `json:"limit" gorm:"column:limit;"`
+	TimeInterval int    `json:"time_interval" gorm:"column:time_interval;"`
 	Retry        int    `json:"retry" gorm:"column:retry;"`
 	DefaultEmail string `json:"default_email" gorm:"column:default_email;"`
 	Status       string `json:"status" gorm:"column:status;"`
@@ -39,7 +39,7 @@ type WebsiteDetail struct {
 	appCommon.SQLModel
 	Name         string `json:"name" gorm:"column:name;"`
 	Path         string `json:"path" gorm:"column:path;"`
-	Limit        int    `json:"limit" gorm:"column:limit;"`
+	TimeInterval int    `json:"time_interval" gorm:"column:time_interval;"`
 	Retry        int    `json:"retry" gorm:"column:retry;"`
 	DefaultEmail string `json:"default_email" gorm:"column:default_email;"`
 	Status       string `json:"status" gorm:"column:status;"`
@@ -49,7 +49,7 @@ type WebsiteCreation struct {
 	Id           int    `json:"id" gorm:"column:id;"`
 	Name         string `json:"name" gorm:"column:name;"`
 	Path         string `json:"path" gorm:"column:path;"`
-	Limit        int    `json:"limit" gorm:"column:limit;"`
+	TimeInterval int    `json:"time_interval" gorm:"column:time_interval;"`
 	Retry        int    `json:"retry" gorm:"column:retry;"`
 	DefaultEmail string `json:"default_email" gorm:"column:default_email;"`
 }
@@ -71,7 +71,7 @@ func (data *WebsiteCreation) Validate() error {
 		return ErrDefaultEmailCannotBeEmpty
 	}
 
-	if data.Limit <= 0 || data.Limit > 43200 {
+	if data.TimeInterval <= 0 || data.TimeInterval > 43200 {
 		return ErrLimitInvalid
 	}
 
@@ -87,7 +87,7 @@ func (WebsiteCreation) TableName() string { return Website{}.TableName() }
 type WebsiteUpdate struct {
 	Name         *string `json:"name" gorm:"column:name;"`
 	Path         *string `json:"path" gorm:"column:path;"`
-	Limit        *int    `json:"limit" gorm:"column:limit;"`
+	TimeInterval *int    `json:"time_interval" gorm:"column:time_interval;"`
 	Retry        *int    `json:"retry" gorm:"column:retry;"`
 	DefaultEmail *string `json:"default_email" gorm:"column:default_email;"`
 	Status       *string `json:"status" gorm:"column:status;"`
@@ -117,8 +117,8 @@ func (data *WebsiteUpdate) Validate() error {
 		}
 	}
 
-	if data.Limit != nil {
-		limit := *data.Limit
+	if data.TimeInterval != nil {
+		limit := *data.TimeInterval
 		if limit <= 0 || limit > 24 {
 			return ErrLimitInvalid
 		}

@@ -2,6 +2,7 @@
 package linkchecker
 
 import (
+	"fmt"
 	"github.com/robfig/cron/v3"
 	"github.com/teddlethal/web-health-check/appCommon"
 	"github.com/teddlethal/web-health-check/checker"
@@ -33,13 +34,28 @@ func NewLinkChecker(configs []WebConfig, alertEmail string, checkInterval, alert
 
 // Start begins the cron job to check links at regular intervals
 func (lc *LinkChecker) Start(db *gorm.DB) {
-	log.Println(lc.configs)
-
 	for _, config := range lc.configs {
-		interval := "@every " + time.Duration((24*3600*1e9)/config.Limit).String()
-		lc.cron.AddFunc(interval, lc.checkLink(config, db))
+		log.Println(config)
+		loc, err := time.LoadLocation(config.TimeZone)
+		if err != nil {
+			log.Printf("Invalid time zone %s for website %s: %v", config.TimeZone, config.Name, err)
+			continue
+		}
+		scheduler := cron.New(cron.WithLocation(loc))
+
+		// Add cron jobs for specific check times
+		for _, checkTime := range config.CheckTimes {
+			scheduler.AddFunc(checkTime, lc.checkLink(config, db))
+		}
+
+		// Add cron job for the interval specified in TimeInterval (seconds)
+		if config.TimeInterval > 0 {
+			interval := fmt.Sprintf("@every %ds", config.TimeInterval)
+			scheduler.AddFunc(interval, lc.checkLink(config, db))
+		}
+		scheduler.Start()
 	}
-	lc.cron.Start()
+
 }
 
 // Stop stops the cron job gracefully
