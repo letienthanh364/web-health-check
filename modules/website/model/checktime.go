@@ -34,3 +34,9 @@ func (data *WebsiteCheckTimeCreation) Validate() error {
 
 	return nil
 }
+
+type WebsiteCheckTimeDelete struct {
+	Id int `json:"id" gorm:"column:id;"`
+}
+
+func (WebsiteCheckTimeDelete) TableName() string { return WebsiteCheckTime{}.TableName() }

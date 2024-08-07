@@ -26,3 +26,7 @@ func (data *WebsiteContactCreation) Validate() error {
 
 	return nil
 }
+
+type WebsiteContactDelete struct {
+	Id int `json:"id" gorm:"column:id;"`
+}

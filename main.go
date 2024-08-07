@@ -8,6 +8,7 @@ import (
 	"github.com/teddlethal/web-health-check/middleware"
 	storageuser "github.com/teddlethal/web-health-check/modules/user/storage"
 	ginuser "github.com/teddlethal/web-health-check/modules/user/transport/gin"
+	"github.com/teddlethal/web-health-check/modules/website/biz"
 	"github.com/teddlethal/web-health-check/routes"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -34,9 +35,16 @@ func main() {
 
 	r := gin.Default()
 
+	// Config the link checker
+	webConfigs := bizwebsite.FetchWebsites(db)
+	alertEmail := "letienthanh364@gmail.com"
+	checkInterval := 10 * time.Minute
+	alertThreshold := 24 * time.Hour
+	lc := linkchecker.NewLinkChecker(webConfigs, alertEmail, checkInterval, alertThreshold)
+
 	// Configure CORS middleware
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -54,7 +62,7 @@ func main() {
 		v1.POST("/login", ginuser.Login(db, tokenProvider))
 	}
 	routes.CustomerRoutes(v1, db, middlewareAuth)
-	routes.WebsiteRoutes(v1, db, middlewareAuth)
+	routes.WebsiteRoutes(v1, db, middlewareAuth, lc)
 	routes.ContactRoutes(v1, db, middlewareAuth)
 	routes.CheckerRoutes(v1)
 
@@ -65,13 +73,8 @@ func main() {
 	})
 
 	//Set up the website business logic
-	//Fetch the list of websites and start the link checker
-	configs := linkchecker.FetchWebsites(db)
-	alertEmail := "letienthanh364@gmail.com"
-	checkInterval := 10 * time.Minute
-	alertThreshold := 30 * time.Minute
-	lc := linkchecker.NewLinkChecker(configs, alertEmail, checkInterval, alertThreshold)
-	lc.Start(db)
+	// Start the link checker
+	lc.Start()
 
 	// Ensure the cron job is stopped gracefully on program exit
 	defer lc.Stop()

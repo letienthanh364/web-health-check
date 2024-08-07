@@ -3,6 +3,7 @@ package ginwebsite
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/appCommon"
+	"github.com/teddlethal/web-health-check/linkchecker"
 	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
 	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
 	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
@@ -10,7 +11,7 @@ import (
 	"net/http"
 )
 
-func CreateWebsite(db *gorm.DB) func(ctx *gin.Context) {
+func CreateWebsite(db *gorm.DB, lc *linkchecker.LinkChecker) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 		var createData modelwebsite.WebsiteCreation
 
@@ -31,6 +32,9 @@ func CreateWebsite(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusBadRequest, appCommon.SimpleSuccessResponse(createData.Id))
+		updateCronJobBiz := bizwebsite.NewUpdateCronJobForWebsiteBiz(lc)
+		go updateCronJobBiz.UpdateCronJobForWebsite(db, createData.Id)
+
+		c.JSON(http.StatusOK, appCommon.SimpleSuccessResponse(createData.Id))
 	}
 }

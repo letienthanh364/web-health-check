@@ -42,5 +42,9 @@ func (biz *deleteContactForWebsiteBiz) DeleteContactForWebsite(ctx context.Conte
 		return modelcontact.ErrContactIsDeleted
 	}
 
+	if err := biz.contactStorage.DeleteContact(ctx, map[string]interface{}{"id": contactId}); err != nil {
+		return appCommon.ErrCannotDeleteEntity(modelcontact.EntityName, err)
+	}
+
 	return nil
 }

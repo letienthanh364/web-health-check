@@ -12,9 +12,9 @@ import (
 	"strconv"
 )
 
-func UpdateWebsite(db *gorm.DB) func(ctx *gin.Context) {
+func DeleteContactForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
+		webId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
@@ -22,20 +22,20 @@ func UpdateWebsite(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		var updateData modelwebsite.WebsiteUpdate
+		var deleteData modelwebsite.WebsiteContactDelete
 
-		if err := c.ShouldBind(&updateData); err != nil {
+		if err := c.ShouldBind(&deleteData); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
 
-		websiteStorage := storagewebsite.NewSqlStore(db)
-		contactStorage := storagecontact.NewSqlStore(db)
-		updateWebsiteBiz := bizwebsite.NewUpdateWebsiteBiz(websiteStorage, contactStorage)
+		webStore := storagewebsite.NewSqlStore(db)
+		contactStore := storagecontact.NewSqlStore(db)
+		business := bizwebsite.NewDeleteContactForWebsiteBiz(webStore, contactStore)
 
-		if err := updateWebsiteBiz.UpdateWebsite(c.Request.Context(), id, &updateData); err != nil {
+		if err := business.DeleteContactForWebsite(c.Request.Context(), webId, deleteData.Id); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})

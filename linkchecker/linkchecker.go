@@ -1,4 +1,3 @@
-// linkchecker/linkchecker.go
 package linkchecker
 
 import (
@@ -6,56 +5,42 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/teddlethal/web-health-check/appCommon"
 	"github.com/teddlethal/web-health-check/checker"
-	modelcontact "github.com/teddlethal/web-health-check/modules/contact/model"
-	storageemail "github.com/teddlethal/web-health-check/modules/contact/storage"
-	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
-	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
-	"gorm.io/gorm"
+	"github.com/teddlethal/web-health-check/modules/website/model"
 	"log"
+	"strconv"
+	"strings"
 	"time"
 )
 
 type LinkChecker struct {
-	configs        []WebConfig
+	configs        []modelwebsite.WebConfig
 	cron           *cron.Cron
 	lastCheckTime  time.Time
 	alertEmail     string
 	checkInterval  time.Duration
 	alertThreshold time.Duration
+	cronEntries    map[int][]cron.EntryID
 }
 
 // NewLinkChecker initializes and returns a new LinkChecker with given configurations
-func NewLinkChecker(configs []WebConfig, alertEmail string, checkInterval, alertThreshold time.Duration) *LinkChecker {
+func NewLinkChecker(configs []modelwebsite.WebConfig, alertEmail string, checkInterval, alertThreshold time.Duration) *LinkChecker {
 	return &LinkChecker{
-		configs: configs,
-		cron:    cron.New(),
+		configs:        configs,
+		cron:           cron.New(),
+		alertEmail:     alertEmail,
+		checkInterval:  checkInterval,
+		alertThreshold: alertThreshold,
+		cronEntries:    make(map[int][]cron.EntryID), // Initialize the map to hold slices of EntryIDs
 	}
 }
 
 // Start begins the cron job to check links at regular intervals
-func (lc *LinkChecker) Start(db *gorm.DB) {
+func (lc *LinkChecker) Start() {
 	for _, config := range lc.configs {
 		log.Println(config)
-		loc, err := time.LoadLocation(config.TimeZone)
-		if err != nil {
-			log.Printf("Invalid time zone %s for website %s: %v", config.TimeZone, config.Name, err)
-			continue
-		}
-		scheduler := cron.New(cron.WithLocation(loc))
-
-		// Add cron jobs for specific check times
-		for _, checkTime := range config.CheckTimes {
-			scheduler.AddFunc(checkTime, lc.checkLink(config, db))
-		}
-
-		// Add cron job for the interval specified in TimeInterval (seconds)
-		if config.TimeInterval > 0 {
-			interval := fmt.Sprintf("@every %ds", config.TimeInterval)
-			scheduler.AddFunc(interval, lc.checkLink(config, db))
-		}
-		scheduler.Start()
+		lc.AddCronJob(config)
 	}
-
+	lc.cron.Start()
 }
 
 // Stop stops the cron job gracefully
@@ -64,12 +49,11 @@ func (lc *LinkChecker) Stop() {
 }
 
 // checkLink checks the link for a given configuration
-func (lc *LinkChecker) checkLink(config WebConfig, db *gorm.DB) func() {
+func (lc *LinkChecker) checkLink(config modelwebsite.WebConfig) func() {
 	return func() {
 		status := "alive"
 		for i := 0; i < config.Retry; i++ {
 			isDead := checker.CheckLink(config.Path)
-			status = "alive"
 			if isDead {
 				status = "dead"
 			}
@@ -79,19 +63,7 @@ func (lc *LinkChecker) checkLink(config WebConfig, db *gorm.DB) func() {
 			}
 		}
 		if status == "dead" {
-			websiteStorage := storagewebsite.NewSqlStore(db)
-			emailStorage := storageemail.NewSqlStore(db)
-			business := bizwebsite.NewListContactsForWebsiteBiz(websiteStorage, emailStorage)
-			contacts, err := business.ListContactsForWebsite(nil, config.WebId, &modelcontact.Filter{}, &appCommon.Paging{
-				Page:  1,
-				Limit: 100,
-			})
-			if err != nil {
-				log.Printf("Failed to get contact list for website %s: %v", config.Name, err)
-			}
-
-			SendNotifications(contacts, config)
-
+			SendNotifications(config)
 		}
 		lc.lastCheckTime = time.Now()
 	}
@@ -105,4 +77,75 @@ func (lc *LinkChecker) selfCheck() {
 			log.Printf("Failed to send self-check alert email to %s: %v", lc.alertEmail, err)
 		}
 	}
+}
+
+func (lc *LinkChecker) StopCronJob(websiteId int) {
+	if entryIDs, exists := lc.cronEntries[websiteId]; exists {
+		for _, entryID := range entryIDs {
+			lc.cron.Remove(entryID)
+		}
+		delete(lc.cronEntries, websiteId)
+	}
+}
+
+func (lc *LinkChecker) AddCronJob(config modelwebsite.WebConfig) {
+	//_, err := time.LoadLocation(config.TimeZone)
+	//if err != nil {
+	//	log.Printf("Invalid time zone %s for website %s: %v", config.TimeZone, config.Name, err)
+	//	return
+	//}
+
+	// Remove this line to avoid reinitializing the cron instance
+	// lc.cron = cron.New(cron.WithLocation(loc))
+
+	// Add cron jobs for specific check times
+	for _, checkTime := range config.CheckTimes {
+		//adjustedCheckTime, err := lc.adjustCronExpression(checkTime, loc)
+		entryID, err := lc.cron.AddFunc(checkTime, lc.checkLink(config))
+		if err != nil {
+			log.Printf("Failed to add cron job for website %s: %v", config.Name, err)
+			continue
+		}
+		lc.cronEntries[config.WebId] = append(lc.cronEntries[config.WebId], entryID)
+	}
+
+	// Add cron job for the interval specified in TimeInterval (seconds)
+	if config.TimeInterval > 0 {
+		interval := fmt.Sprintf("@every %ds", config.TimeInterval)
+		entryID, err := lc.cron.AddFunc(interval, lc.checkLink(config))
+		if err != nil {
+			log.Printf("Failed to add cron job for website %s: %v", config.Name, err)
+			return
+		}
+		lc.cronEntries[config.WebId] = append(lc.cronEntries[config.WebId], entryID)
+	}
+}
+
+// adjusts the cron expression based on the specified timezone
+func (lc *LinkChecker) adjustCronExpression(cronExpr string, loc *time.Location) (string, error) {
+	parts := strings.Fields(cronExpr)
+	if len(parts) != 5 {
+		return "", fmt.Errorf("invalid cron expression: %s", cronExpr)
+	}
+
+	// Parse the minute and hour
+	minute, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return "", fmt.Errorf("invalid minute in cron expression: %s", parts[0])
+	}
+	hour, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return "", fmt.Errorf("invalid hour in cron expression: %s", parts[1])
+	}
+
+	// Create a time.Time with the parsed hour and minute in UTC
+	t := time.Date(0, 1, 1, hour, minute, 0, 0, time.UTC)
+
+	// Convert the time to the specified timezone
+	t = t.In(loc)
+
+	// Adjust the cron expression with the new hour and minute
+	adjustedCronExpr := fmt.Sprintf("%d %d %s %s %s", t.Minute(), t.Hour(), parts[2], parts[3], parts[4])
+
+	return adjustedCronExpr, nil
 }

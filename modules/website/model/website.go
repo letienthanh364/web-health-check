@@ -14,7 +14,7 @@ var (
 	ErrWebsiteIsDeleted           = errors.New("website is deleted")
 	ErrNameCannotBeEmpty          = errors.New("name cannot be empty")
 	ErrPathCannotBeEmpty          = errors.New("path cannot be empty")
-	ErrLimitInvalid               = errors.New("limit is invalid")
+	ErrTimeIntervalInvalid        = errors.New("time interval is invalid")
 	ErrRetryInvalid               = errors.New("retry is invalid")
 	ErrDefaultEmailCannotBeEmpty  = errors.New("default_email cannot be empty")
 	ErrContactLinkCannotBeEmpty   = errors.New("contact link cannot be empty")
@@ -23,12 +23,14 @@ var (
 
 type Website struct {
 	appCommon.SQLModel
+	Status string `json:"status" gorm:"column:status;"`
+
 	Name         string `json:"name" gorm:"column:name;"`
 	Path         string `json:"path" gorm:"column:path;"`
 	TimeInterval int    `json:"time_interval" gorm:"column:time_interval;"`
 	Retry        int    `json:"retry" gorm:"column:retry;"`
 	DefaultEmail string `json:"default_email" gorm:"column:default_email;"`
-	Status       string `json:"status" gorm:"column:status;"`
+	//TimeZone     string `json:"time_zone" gorm:"column:time_zone;"`
 }
 
 func (Website) TableName() string {
@@ -52,30 +54,31 @@ type WebsiteCreation struct {
 	TimeInterval int    `json:"time_interval" gorm:"column:time_interval;"`
 	Retry        int    `json:"retry" gorm:"column:retry;"`
 	DefaultEmail string `json:"default_email" gorm:"column:default_email;"`
+	//TimeZone     string `json:"time_zone" gorm:"column:time_zone;"`
 }
 
 func (data *WebsiteCreation) Validate() error {
-	data.Name = strings.TrimSpace(data.Name)
-	if data.Name == "" {
+	name := strings.TrimSpace(data.Name)
+	if name == "" {
 
 		return ErrNameCannotBeEmpty
 	}
 
-	data.Path = strings.TrimSpace(data.Path)
-	if data.Path == "" {
+	path := strings.TrimSpace(data.Path)
+	if path == "" {
 		return ErrPathCannotBeEmpty
 	}
 
-	data.DefaultEmail = strings.TrimSpace(data.DefaultEmail)
-	if data.DefaultEmail == "" {
+	defaultEmail := strings.TrimSpace(data.DefaultEmail)
+	if defaultEmail == "" {
 		return ErrDefaultEmailCannotBeEmpty
 	}
 
-	if data.TimeInterval <= 0 || data.TimeInterval > 43200 {
-		return ErrLimitInvalid
+	if data.TimeInterval <= 60 {
+		return ErrTimeIntervalInvalid
 	}
 
-	if data.Retry <= 0 || data.Retry > 10 {
+	if data.Retry < 0 || data.Retry > 10 {
 		return ErrRetryInvalid
 	}
 
@@ -85,12 +88,13 @@ func (data *WebsiteCreation) Validate() error {
 func (WebsiteCreation) TableName() string { return Website{}.TableName() }
 
 type WebsiteUpdate struct {
+	Status       *string `json:"status" gorm:"column:status;"`
 	Name         *string `json:"name" gorm:"column:name;"`
 	Path         *string `json:"path" gorm:"column:path;"`
 	TimeInterval *int    `json:"time_interval" gorm:"column:time_interval;"`
 	Retry        *int    `json:"retry" gorm:"column:retry;"`
 	DefaultEmail *string `json:"default_email" gorm:"column:default_email;"`
-	Status       *string `json:"status" gorm:"column:status;"`
+	//TimeZone     *string `json:"time_zone" gorm:"column:time_zone;"`
 }
 
 func (WebsiteUpdate) TableName() string { return Website{}.TableName() }
@@ -118,15 +122,15 @@ func (data *WebsiteUpdate) Validate() error {
 	}
 
 	if data.TimeInterval != nil {
-		limit := *data.TimeInterval
-		if limit <= 0 || limit > 24 {
-			return ErrLimitInvalid
+		timeInterval := *data.TimeInterval
+		if timeInterval <= 60 {
+			return ErrTimeIntervalInvalid
 		}
 	}
 
 	if data.Retry != nil {
 		retry := *data.Retry
-		if retry <= 0 || retry > 24 {
+		if retry < 0 || retry > 24 {
 			return ErrRetryInvalid
 		}
 	}
