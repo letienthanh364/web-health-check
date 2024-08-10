@@ -79,7 +79,7 @@ func main() {
 	// Ensure the cron job is stopped gracefully on program exit
 	defer lc.Stop()
 
-	errRun := r.Run(":2000")
+	errRun := r.Run(":8080")
 
 	if errRun != nil {
 		return
