@@ -3,9 +3,8 @@ package ginwebsite
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/appCommon"
-	modelcontact "github.com/teddlethal/web-health-check/modules/contact/model"
-	storagecontact "github.com/teddlethal/web-health-check/modules/contact/storage"
-	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
+	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz/website_contact"
+	modelcontact "github.com/teddlethal/web-health-check/modules/website/model"
 	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
 	"gorm.io/gorm"
 	"net/http"
@@ -16,7 +15,7 @@ func ListContactsForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 		var queryString struct {
 			appCommon.Paging
-			modelcontact.Filter
+			modelcontact.WebsiteContactFilter
 		}
 
 		id, err := strconv.Atoi(c.Param("id"))
@@ -27,11 +26,10 @@ func ListContactsForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		websiteStorage := storagewebsite.NewSqlStore(db)
-		contactStorage := storagecontact.NewSqlStore(db)
-		business := bizwebsite.NewListContactsForWebsiteBiz(websiteStorage, contactStorage)
+		store := storagewebsite.NewSqlStore(db)
+		business := bizwebsite.NewListContactsForWebsiteBiz(store)
 
-		res, err := business.ListContactsForWebsite(c.Request.Context(), id, &queryString.Filter, &queryString.Paging)
+		res, err := business.ListContactsForWebsite(c.Request.Context(), id, &queryString.WebsiteContactFilter, &queryString.Paging)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),

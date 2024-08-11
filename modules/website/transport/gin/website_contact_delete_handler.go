@@ -3,8 +3,7 @@ package ginwebsite
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/appCommon"
-	storagecontact "github.com/teddlethal/web-health-check/modules/contact/storage"
-	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
+	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz/website_contact"
 	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
 	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
 	"gorm.io/gorm"
@@ -31,9 +30,8 @@ func DeleteContactForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		webStore := storagewebsite.NewSqlStore(db)
-		contactStore := storagecontact.NewSqlStore(db)
-		business := bizwebsite.NewDeleteContactForWebsiteBiz(webStore, contactStore)
+		store := storagewebsite.NewSqlStore(db)
+		business := bizwebsite.NewDeleteContactForWebsiteBiz(store)
 
 		if err := business.DeleteContactForWebsite(c.Request.Context(), webId, deleteData.Id); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{

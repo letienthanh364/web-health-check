@@ -3,9 +3,8 @@ package ginwebsite
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/appCommon"
-	storagecontact "github.com/teddlethal/web-health-check/modules/contact/storage"
-	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
-	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
+	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz/website_contact"
+	"github.com/teddlethal/web-health-check/modules/website/model"
 	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
 	"gorm.io/gorm"
 	"net/http"
@@ -38,18 +37,16 @@ func AddContactForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		contactStorage := storagecontact.NewSqlStore(db)
 		websiteStorage := storagewebsite.NewSqlStore(db)
-		business := bizwebsite.NewAddContactForWebsiteBiz(contactStorage, websiteStorage)
+		business := bizwebsite.NewAddContactForWebsiteBiz(websiteStorage)
 
-		returnId, err := business.AddContactForWebsite(c.Request.Context(), id, &addContactData)
-		if err != nil {
+		if err := business.AddContactForWebsite(c.Request.Context(), id, &addContactData); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
 
-		c.JSON(http.StatusOK, appCommon.SimpleSuccessResponse(returnId))
+		c.JSON(http.StatusOK, appCommon.SimpleSuccessResponse("success"))
 	}
 }

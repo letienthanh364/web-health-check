@@ -22,9 +22,13 @@ func NewDeleteCheckTimeForWebsiteBiz(store DeleteCheckTimeForWebsiteStorage) *de
 }
 
 func (biz *deleteCheckTimeForWebsiteBiz) DeleteCheckTimeForWebsite(ctx context.Context, websiteId int, checkTimeId int) error {
-	_, err := biz.store.GetWebsite(ctx, map[string]interface{}{"id": websiteId})
+	websiteData, err := biz.store.GetWebsite(ctx, map[string]interface{}{"id": websiteId})
 	if err != nil {
 		return appCommon.ErrCannotGetEntity(modelwebsite.EntityName, err)
+	}
+
+	if websiteData.Status == "deleted" {
+		return modelwebsite.ErrWebsiteIsDeleted
 	}
 
 	if err := biz.store.DeleteWebsiteCheckTime(ctx, map[string]interface{}{"id": checkTimeId}); err != nil {

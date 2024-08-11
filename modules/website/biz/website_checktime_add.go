@@ -36,7 +36,7 @@ func (biz *addWebsiteCheckTimeForWebsiteBiz) AddCheckTimeForWebsite(ctx context.
 		CheckTime: data.CheckTime,
 	}
 	if err := biz.store.CreateWebsiteCheckTime(ctx, &contactCreate); err != nil {
-		return err
+		return appCommon.ErrCannotCreateEntity(modelwebsite.WebsiteCheckTimeEntity, err)
 	}
 
 	return nil
