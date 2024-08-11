@@ -2,14 +2,12 @@ package bizwebsite
 
 import (
 	"github.com/teddlethal/web-health-check/appCommon"
-	bizecontact "github.com/teddlethal/web-health-check/modules/contact/biz"
-	modelcontact "github.com/teddlethal/web-health-check/modules/contact/model"
-	storagecontact "github.com/teddlethal/web-health-check/modules/contact/storage"
 	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
 	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
 	"gorm.io/gorm"
 	"log"
 	"strconv"
+	"time"
 )
 
 // FetchWebsites fetches the list of websites from the database
@@ -43,16 +41,18 @@ func FetchWebsites(db *gorm.DB) []modelwebsite.WebConfig {
 		}
 
 		config := modelwebsite.WebConfig{
-			WebId:        website.Id,
-			Name:         website.Name,
-			Path:         website.Path,
-			TimeInterval: website.TimeInterval,
-			Retry:        website.Retry,
-			DefaultEmail: website.DefaultEmail,
-			Status:       website.Status,
-			CheckTimes:   checkTimeList,
-			Contacts:     contactList,
-			TimeZone:     "Asia/Ho_Chi_Minh",
+			WebId:                website.Id,
+			Name:                 website.Name,
+			Path:                 website.Path,
+			TimeInterval:         website.TimeInterval,
+			Retry:                website.Retry,
+			DefaultEmail:         website.DefaultEmail,
+			Status:               website.Status,
+			CheckTimes:           checkTimeList,
+			Contacts:             contactList,
+			TimeZone:             "Asia/Ho_Chi_Minh",
+			NotificationSent:     false,
+			LastNotificationDate: time.Now(),
 		}
 		configs = append(configs, config)
 	}
@@ -74,27 +74,29 @@ func FetchWebsite(db *gorm.DB, websiteId int) *modelwebsite.WebConfig {
 
 	contactList, err := FetchContactsForWebsite(db, websiteId)
 	if err != nil {
-		log.Printf("Error refetching website: %v", appCommon.ErrCannotListEntity(modelcontact.EntityName, err))
+		log.Printf("Error refetching website: %v", appCommon.ErrCannotListEntity(modelwebsite.WebsiteContactEntity, err))
 		return nil
 	}
 
 	checkTimeList, err := FetchCheckTimesForWebsite(db, websiteId)
 	if err != nil {
-		log.Printf("Error refetching website: %v", appCommon.ErrCannotListEntity("website check time", err))
+		log.Printf("Error refetching website: %v", appCommon.ErrCannotListEntity(modelwebsite.WebsiteCheckTimeEntity, err))
 		return nil
 	}
 
 	// Convert newData to Config
 	config := &modelwebsite.WebConfig{
-		WebId:        website.Id,
-		Name:         website.Name,
-		Path:         website.Path,
-		TimeInterval: website.TimeInterval,
-		Retry:        website.Retry,
-		DefaultEmail: website.DefaultEmail,
-		TimeZone:     "Asia/Ho_Chi_Minh",
-		Contacts:     contactList,
-		CheckTimes:   checkTimeList,
+		WebId:                website.Id,
+		Name:                 website.Name,
+		Path:                 website.Path,
+		TimeInterval:         website.TimeInterval,
+		Retry:                website.Retry,
+		DefaultEmail:         website.DefaultEmail,
+		Contacts:             contactList,
+		CheckTimes:           checkTimeList,
+		TimeZone:             "Asia/Ho_Chi_Minh",
+		NotificationSent:     false,
+		LastNotificationDate: time.Now(),
 	}
 
 	return config
@@ -124,28 +126,19 @@ func FetchCheckTimesForWebsite(db *gorm.DB, websiteId int) ([]string, error) {
 }
 
 func FetchContactsForWebsite(db *gorm.DB, websiteId int) ([]modelwebsite.WebsiteContact, error) {
-	contactStorage := storagecontact.NewSqlStore(db)
-	contactBiz := bizecontact.NewListContactBiz(contactStorage)
-	contactFilter := &modelcontact.Filter{WebsiteId: strconv.Itoa(websiteId)}
+	contactStorage := storagewebsite.NewSqlStore(db)
+	contactBiz := NewListContactsForWebsiteBiz(contactStorage)
+	contactFilter := &modelwebsite.WebsiteContactFilter{WebsiteId: strconv.Itoa(websiteId)}
 
 	paging := &appCommon.Paging{
 		Page:  1,
 		Limit: 50,
 	}
 
-	contactRes, err := contactBiz.ListContacts(nil, contactFilter, paging)
+	contactRes, err := contactBiz.ListContactsForWebsite(nil, websiteId, contactFilter, paging)
 	if err != nil {
 		return nil, err
 	}
-	var contactList []modelwebsite.WebsiteContact
-	for _, contact := range contactRes {
-		c := modelwebsite.WebsiteContact{
-			Id:             contact.Id,
-			ContactAddress: contact.Address,
-			ContactMethod:  contact.ContactMethod,
-		}
-		contactList = append(contactList, c)
-	}
 
-	return contactList, nil
+	return contactRes, nil
 }

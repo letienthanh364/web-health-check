@@ -1,30 +1,28 @@
-package storagecontact
+package storagewebsite
 
 import (
 	"context"
 	"github.com/teddlethal/web-health-check/appCommon"
-	modelcontact "github.com/teddlethal/web-health-check/modules/contact/model"
+	"github.com/teddlethal/web-health-check/modules/website/model"
 )
 
-func (s *sqlStore) ListContacts(ctx context.Context,
-	filter *modelcontact.Filter,
+func (s *sqlStore) ListWebsiteContacts(ctx context.Context,
+	filter *modelwebsite.WebsiteContactFilter,
 	paging *appCommon.Paging,
-	moreKeys ...string) ([]modelcontact.Contact, error) {
-	var res []modelcontact.Contact
+	moreKeys ...string) ([]modelwebsite.WebsiteContact, error) {
+	var res []modelwebsite.WebsiteContact
 
-	db := s.db.Where("status <> ?", "deleted")
+	db := s.db
 
 	if f := filter; f != nil {
-		if v := f.Status; v != "" {
-			db = db.Where("status = ?", v)
-		}
+
 		if v := f.WebsiteId; v != "" {
 			db = db.Where("website_id = ?", v)
 		}
 	}
 
 	if err := db.
-		Table(modelcontact.Contact{}.TableName()).
+		Table(modelwebsite.WebsiteContact{}.TableName()).
 		Select("id").
 		Count(&paging.Total).Error; err != nil {
 		return nil, appCommon.ErrDB(err)

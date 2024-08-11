@@ -11,14 +11,12 @@ const (
 )
 
 var (
-	ErrWebsiteIsDeleted           = errors.New("website is deleted")
-	ErrNameCannotBeEmpty          = errors.New("name cannot be empty")
-	ErrPathCannotBeEmpty          = errors.New("path cannot be empty")
-	ErrTimeIntervalInvalid        = errors.New("time interval is invalid")
-	ErrRetryInvalid               = errors.New("retry is invalid")
-	ErrDefaultEmailCannotBeEmpty  = errors.New("default_email cannot be empty")
-	ErrContactLinkCannotBeEmpty   = errors.New("contact link cannot be empty")
-	ErrContactMethodCannotBeEmpty = errors.New("contact method cannot be empty")
+	ErrWebsiteIsDeleted          = errors.New("website is deleted")
+	ErrNameCannotBeEmpty         = errors.New("name cannot be empty")
+	ErrPathCannotBeEmpty         = errors.New("path cannot be empty")
+	ErrTimeIntervalInvalid       = errors.New("time interval is invalid")
+	ErrRetryInvalid              = errors.New("retry is invalid")
+	ErrDefaultEmailCannotBeEmpty = errors.New("default_email cannot be empty")
 )
 
 type Website struct {

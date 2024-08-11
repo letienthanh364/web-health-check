@@ -63,7 +63,6 @@ func main() {
 	}
 	routes.CustomerRoutes(v1, db, middlewareAuth)
 	routes.WebsiteRoutes(v1, db, middlewareAuth, lc)
-	routes.ContactRoutes(v1, db, middlewareAuth)
 	routes.CheckerRoutes(v1)
 
 	r.GET("/ping", func(c *gin.Context) {

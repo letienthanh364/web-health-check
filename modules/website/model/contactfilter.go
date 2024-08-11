@@ -1,5 +1,5 @@
-package website_contact
+package modelwebsite
 
-type Filter struct {
+type WebsiteContactFilter struct {
 	WebsiteId string `json:"website_id,omitempty" form:"website_id"`
 }

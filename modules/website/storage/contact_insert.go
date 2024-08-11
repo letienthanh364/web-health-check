@@ -1,12 +1,12 @@
-package storagecontact
+package storagewebsite
 
 import (
 	"context"
 	"github.com/teddlethal/web-health-check/appCommon"
-	modelemail "github.com/teddlethal/web-health-check/modules/contact/model"
+	"github.com/teddlethal/web-health-check/modules/website/model"
 )
 
-func (s *sqlStore) CreateContact(ctx context.Context, data *modelemail.ContactCreation) error {
+func (s *sqlStore) CreateWebsiteContact(ctx context.Context, data *modelwebsite.WebsiteContactCreation) error {
 	if err := s.db.Create(data).Error; err != nil {
 		return appCommon.ErrDB(err)
 	}

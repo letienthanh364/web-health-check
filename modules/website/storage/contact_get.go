@@ -1,13 +1,13 @@
-package storagecontact
+package storagewebsite
 
 import (
 	"context"
 	"github.com/teddlethal/web-health-check/appCommon"
-	"github.com/teddlethal/web-health-check/modules/contact/model"
+	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
 )
 
-func (s *sqlStore) GetContact(ctx context.Context, cond map[string]interface{}) (*modelcontact.Contact, error) {
-	var data modelcontact.Contact
+func (s *sqlStore) GetWebsiteContact(ctx context.Context, cond map[string]interface{}) (*modelwebsite.WebsiteContact, error) {
+	var data modelwebsite.WebsiteContact
 
 	if err := s.db.Where(cond).First(&data).Error; err != nil {
 		return nil, appCommon.ErrDB(err)

@@ -24,11 +24,11 @@ func WebsiteRoutes(router *gin.RouterGroup, db *gorm.DB, authMiddleware func(c *
 			contacts.DELETE("/:id", ginwebsite.DeleteContactForWebsite(db), middleware.UpdateCronJobMiddleware(lc, db, false))
 		}
 
-		checktimes := items.Group("/check-time")
+		checkTimes := items.Group("/check-time")
 		{
-			checktimes.POST("/:id", ginwebsite.AddCheckTimeForWebsite(db), middleware.UpdateCronJobMiddleware(lc, db, false))
-			checktimes.GET("/:id", ginwebsite.ListCheckTimesForWebsite(db))
-			checktimes.DELETE("/:id", ginwebsite.DeleteCheckTimeForWebsite(db), middleware.UpdateCronJobMiddleware(lc, db, false))
+			checkTimes.POST("/:id", ginwebsite.AddCheckTimeForWebsite(db), middleware.UpdateCronJobMiddleware(lc, db, false))
+			checkTimes.GET("/:id", ginwebsite.ListCheckTimesForWebsite(db))
+			checkTimes.DELETE("/:id", ginwebsite.DeleteCheckTimeForWebsite(db), middleware.UpdateCronJobMiddleware(lc, db, false))
 
 		}
 	}

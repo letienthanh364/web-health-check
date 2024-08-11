@@ -5,6 +5,10 @@ import (
 	"strings"
 )
 
+const (
+	WebsiteCheckTimeEntity = "website check time"
+)
+
 var (
 	ErrCheckTimeCannotBeEmpty = errors.New("check time cannot be empty")
 )

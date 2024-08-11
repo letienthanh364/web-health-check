@@ -3,7 +3,6 @@ package ginwebsite
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/teddlethal/web-health-check/appCommon"
-	storagecontact "github.com/teddlethal/web-health-check/modules/contact/storage"
 	bizwebsite "github.com/teddlethal/web-health-check/modules/website/biz"
 	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
 	storagewebsite "github.com/teddlethal/web-health-check/modules/website/storage"
@@ -31,9 +30,8 @@ func UpdateWebsite(db *gorm.DB) func(ctx *gin.Context) {
 			return
 		}
 
-		websiteStorage := storagewebsite.NewSqlStore(db)
-		contactStorage := storagecontact.NewSqlStore(db)
-		updateWebsiteBiz := bizwebsite.NewUpdateWebsiteBiz(websiteStorage, contactStorage)
+		store := storagewebsite.NewSqlStore(db)
+		updateWebsiteBiz := bizwebsite.NewUpdateWebsiteBiz(store)
 
 		if err := updateWebsiteBiz.UpdateWebsite(c.Request.Context(), id, &updateData); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{

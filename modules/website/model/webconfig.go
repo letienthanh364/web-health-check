@@ -1,6 +1,8 @@
 package modelwebsite
 
-import "time"
+import (
+	"time"
+)
 
 type WebConfig struct {
 	Status               string

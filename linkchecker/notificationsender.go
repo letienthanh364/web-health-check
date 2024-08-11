@@ -13,13 +13,13 @@ func SendNotifications(config modelwebsite.WebConfig) {
 	subject := "Link Down Notification"
 	msg := fmt.Sprintf("The link %s is down. Website: %s", config.Path, config.Name)
 	for _, contact := range contacts {
-		contactAddress := contact.ContactAddress
+		contactAddress := contact.Address
 		switch contact.ContactMethod {
 		case "email":
 			if err := appCommon.SendEmail(contactAddress, subject, msg); err != nil {
 				log.Printf("Failed to sended contact to %s: %v", config.DefaultEmail, err)
 			}
-			log.Printf("Sucessfully sended notifacation to address: %s, method: %s.", contact.ContactAddress, contact.ContactMethod)
+			log.Printf("Sucessfully sended notifacation to address: %s, method: %s.", contact.Address, contact.ContactMethod)
 
 		case "discord":
 			if contactAddress != "" {
@@ -27,7 +27,7 @@ func SendNotifications(config modelwebsite.WebConfig) {
 					log.Printf("Failed to send Discord notification: %v", err)
 				}
 			}
-			log.Printf("Sucessfully send notifacation to address: %s, method: %s.", contact.ContactAddress, contact.ContactMethod)
+			log.Printf("Sucessfully send notifacation to address: %s, method: %s.", contact.Address, contact.ContactMethod)
 
 		default:
 			log.Printf("Invalid method contact: %s.", contact.ContactMethod)

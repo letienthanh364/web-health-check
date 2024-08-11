@@ -3,7 +3,7 @@ package storagewebsite
 import (
 	"context"
 	"github.com/teddlethal/web-health-check/appCommon"
-	modelwebsite "github.com/teddlethal/web-health-check/modules/website/model"
+	"github.com/teddlethal/web-health-check/modules/website/model"
 )
 
 func (s *sqlStore) ListCheckTimes(ctx context.Context,
