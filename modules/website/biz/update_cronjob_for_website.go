@@ -18,12 +18,13 @@ func (biz *updateCronJobForWebsiteBiz) UpdateCronJobForWebsite(db *gorm.DB, webs
 	newConfig := FetchWebsite(db, websiteId)
 	log.Printf("New Website config: %v", *newConfig)
 
-	log.Printf("Restarting the cron job for the website: %s", newConfig.Name)
 	// Stop the existing cron job
+	log.Printf("Removing the cron job of the website: %s", newConfig.Name)
 	biz.linkChecker.StopCronJob(websiteId)
 
 	// Add the new cron job
+	log.Printf("Adding the cron job for the website: %s", newConfig.Name)
 	biz.linkChecker.AddCronJob(*newConfig)
 
-	log.Printf("Successfully restarted the cron job for the website: %s", newConfig.Name)
+	log.Printf("Successfully added the cron job for the website: %s", newConfig.Name)
 }

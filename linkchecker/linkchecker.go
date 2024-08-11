@@ -49,7 +49,7 @@ func (lc *LinkChecker) Stop() {
 }
 
 // checkLink checks the link for a given configuration
-func (lc *LinkChecker) checkLink(config modelwebsite.WebConfig) func() {
+func (lc *LinkChecker) checkLink(config *modelwebsite.WebConfig) func() {
 	return func() {
 		status := "alive"
 		for i := 0; i < config.Retry; i++ {
@@ -59,11 +59,21 @@ func (lc *LinkChecker) checkLink(config modelwebsite.WebConfig) func() {
 			}
 			log.Printf("Website: %s, URL: %s, Status: %s\n", config.Name, config.Path, status)
 			if status == "alive" {
+				// If the link is alive, reset the notification flag
+				config.NotificationSent = false
+				config.LastNotificationDate = time.Time{} // Reset the last notification date
 				break
 			}
 		}
 		if status == "dead" {
-			SendNotifications(config)
+			today := time.Now().Format("2006-01-02")
+			lastNotified := config.LastNotificationDate.Format("2006-01-02")
+
+			if !config.NotificationSent || lastNotified != today {
+				SendNotifications(*config)
+				config.NotificationSent = true
+				config.LastNotificationDate = time.Now()
+			}
 		}
 		lc.lastCheckTime = time.Now()
 	}
@@ -95,13 +105,10 @@ func (lc *LinkChecker) AddCronJob(config modelwebsite.WebConfig) {
 	//	return
 	//}
 
-	// Remove this line to avoid reinitializing the cron instance
-	// lc.cron = cron.New(cron.WithLocation(loc))
-
 	// Add cron jobs for specific check times
 	for _, checkTime := range config.CheckTimes {
 		//adjustedCheckTime, err := lc.adjustCronExpression(checkTime, loc)
-		entryID, err := lc.cron.AddFunc(checkTime, lc.checkLink(config))
+		entryID, err := lc.cron.AddFunc(checkTime, lc.checkLink(&config))
 		if err != nil {
 			log.Printf("Failed to add cron job for website %s: %v", config.Name, err)
 			continue
@@ -112,7 +119,7 @@ func (lc *LinkChecker) AddCronJob(config modelwebsite.WebConfig) {
 	// Add cron job for the interval specified in TimeInterval (seconds)
 	if config.TimeInterval > 0 {
 		interval := fmt.Sprintf("@every %ds", config.TimeInterval)
-		entryID, err := lc.cron.AddFunc(interval, lc.checkLink(config))
+		entryID, err := lc.cron.AddFunc(interval, lc.checkLink(&config))
 		if err != nil {
 			log.Printf("Failed to add cron job for website %s: %v", config.Name, err)
 			return
