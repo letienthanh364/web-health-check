@@ -17,6 +17,7 @@ var (
 	ErrTimeIntervalInvalid       = errors.New("time interval is invalid")
 	ErrRetryInvalid              = errors.New("retry is invalid")
 	ErrDefaultEmailCannotBeEmpty = errors.New("default_email cannot be empty")
+	ErrPathIsExisted             = errors.New("website path is already existed")
 )
 
 type Website struct {

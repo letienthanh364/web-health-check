@@ -31,6 +31,13 @@ func (biz *updateWebsiteBiz) UpdateWebsite(ctx context.Context, websiteId int, u
 		return modelwebsite.ErrWebsiteIsDeleted
 	}
 
+	// Check if website path is existed
+	website, _ := biz.store.GetWebsite(ctx, map[string]interface{}{"path": updateData.Path})
+	if website != nil && website.Id != websiteId {
+		return modelwebsite.ErrPathIsExisted
+	}
+
+	// Update website
 	if err := updateData.Validate(); err != nil {
 		return err
 	}

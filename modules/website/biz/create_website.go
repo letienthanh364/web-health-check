@@ -8,6 +8,7 @@ import (
 
 type CreateWebsiteStorage interface {
 	CreateWebsite(ctx context.Context, data *modelwebsite.WebsiteCreation) error
+	GetWebsite(ctx context.Context, cond map[string]interface{}) (*modelwebsite.Website, error)
 }
 
 type createWebsiteBiz struct {
@@ -23,6 +24,13 @@ func (biz *createWebsiteBiz) CreateNewWebsite(ctx context.Context, data *modelwe
 		return err
 	}
 
+	// Check if website path is existed
+	website, _ := biz.store.GetWebsite(ctx, map[string]interface{}{"path": data.Path})
+	if website != nil {
+		return modelwebsite.ErrPathIsExisted
+	}
+
+	// Create new website
 	if err := biz.store.CreateWebsite(ctx, data); err != nil {
 		return appCommon.ErrCannotCreateEntity(modelwebsite.EntityName, err)
 	}
