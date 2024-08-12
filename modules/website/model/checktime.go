@@ -7,10 +7,13 @@ import (
 
 const (
 	WebsiteCheckTimeEntity = "website check time"
+	CheckTimeLimit         = 5
 )
 
 var (
 	ErrCheckTimeCannotBeEmpty = errors.New("check time cannot be empty")
+	ErrCheckTimeIsExisted     = errors.New("check time is already existed")
+	ErrCheckTimeExceedLimit   = errors.New("the number of check times is exceeding the limit")
 )
 
 type WebsiteCheckTime struct {

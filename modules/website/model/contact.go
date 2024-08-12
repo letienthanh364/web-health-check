@@ -7,12 +7,14 @@ import (
 
 const (
 	WebsiteContactEntity = "website contact"
+	ContactLimit         = 5
 )
 
 var (
-	ErrWebsiteIdIsRequired        = errors.New("website id is required")
 	ErrAddressCannotBeEmpty       = errors.New("address cannot be empty")
 	ErrContactMethodCannotBeEmpty = errors.New("contact method cannot be empty")
+	ErrContactIsExisted           = errors.New("contact is already existed")
+	ErrContactExceedLimit         = errors.New("the number of contacts is exceeding the limit")
 )
 
 type WebsiteContact struct {
@@ -33,10 +35,6 @@ type WebsiteContactCreation struct {
 }
 
 func (data *WebsiteContactCreation) Validate() error {
-	if data.WebsiteId == 0 {
-		return ErrWebsiteIdIsRequired
-	}
-
 	data.Address = strings.TrimSpace(data.Address)
 	if data.Address == "" {
 		return ErrAddressCannotBeEmpty
