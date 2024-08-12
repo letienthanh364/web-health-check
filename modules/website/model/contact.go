@@ -2,6 +2,7 @@ package modelwebsite
 
 import (
 	"errors"
+	"github.com/teddlethal/web-health-check/appCommon"
 	"strings"
 )
 
@@ -11,10 +12,10 @@ const (
 )
 
 var (
-	ErrAddressCannotBeEmpty       = errors.New("address cannot be empty")
-	ErrContactMethodCannotBeEmpty = errors.New("contact method cannot be empty")
-	ErrContactIsExisted           = errors.New("contact is already existed")
-	ErrContactExceedLimit         = errors.New("the number of contacts is exceeding the limit")
+	ErrAddressCannotBeEmpty       = appCommon.NewErrorResponse(errors.New("address cannot be empty"), "address cannot be empty", "address cannot be empty", "ErrAddressCannotBeEmpty")
+	ErrContactMethodCannotBeEmpty = appCommon.NewErrorResponse(errors.New("contact method cannot be empty"), "contact method cannot be empty", "contact method cannot be empty", "ErrContactMethodCannotBeEmpty")
+	ErrContactExisted             = appCommon.NewErrorResponse(errors.New("contact is already existed"), "contact is already existed", "contact is already existed", "ErrContactExisted")
+	ErrContactExceedLimit         = appCommon.NewErrorResponse(errors.New("the number of contacts is exceeding the limit"), "the number of contacts is exceeding the limit", "the number of contacts is exceeding the limit", "ErrContactExceedLimit")
 )
 
 type WebsiteContact struct {

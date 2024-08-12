@@ -15,25 +15,19 @@ func AddContactForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
 		var addContactData modelwebsite.WebsiteContactCreation
 
 		if err := c.ShouldBind(&addContactData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
 		if err := addContactData.Validate(); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
@@ -41,9 +35,7 @@ func AddContactForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 		business := bizwebsite.NewAddContactForWebsiteBiz(websiteStorage)
 
 		if err := business.AddContactForWebsite(c.Request.Context(), id, &addContactData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 

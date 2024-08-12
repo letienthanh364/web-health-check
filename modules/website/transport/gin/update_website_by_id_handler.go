@@ -15,18 +15,14 @@ func UpdateWebsite(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
 		var updateData modelwebsite.WebsiteUpdate
 
 		if err := c.ShouldBind(&updateData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
@@ -34,9 +30,7 @@ func UpdateWebsite(db *gorm.DB) func(ctx *gin.Context) {
 		updateWebsiteBiz := bizwebsite.NewUpdateWebsiteBiz(store)
 
 		if err := updateWebsiteBiz.UpdateWebsite(c.Request.Context(), id, &updateData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 

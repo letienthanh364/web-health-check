@@ -16,9 +16,7 @@ func CreateWebsite(db *gorm.DB, lc *linkchecker.LinkChecker) func(ctx *gin.Conte
 		var createData modelwebsite.WebsiteCreation
 
 		if err := c.ShouldBind(&createData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
@@ -26,9 +24,7 @@ func CreateWebsite(db *gorm.DB, lc *linkchecker.LinkChecker) func(ctx *gin.Conte
 		business := bizwebsite.NewCreateWebsiteBiz(store)
 
 		if err := business.CreateNewWebsite(c.Request.Context(), &createData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 

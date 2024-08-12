@@ -54,7 +54,7 @@ func (biz *addWebsiteCheckTimeForWebsiteBiz) AddCheckTimeForWebsite(ctx context.
 
 	for _, c := range checktimeList {
 		if c.CheckTime == data.CheckTime {
-			return modelwebsite.ErrCheckTimeIsExisted
+			return modelwebsite.ErrCheckTimeExisted
 		}
 	}
 

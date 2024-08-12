@@ -2,6 +2,7 @@ package modelwebsite
 
 import (
 	"errors"
+	"github.com/teddlethal/web-health-check/appCommon"
 	"strings"
 )
 
@@ -11,9 +12,9 @@ const (
 )
 
 var (
-	ErrCheckTimeCannotBeEmpty = errors.New("check time cannot be empty")
-	ErrCheckTimeIsExisted     = errors.New("check time is already existed")
-	ErrCheckTimeExceedLimit   = errors.New("the number of check times is exceeding the limit")
+	ErrCheckTimeCannotBeEmpty = appCommon.NewErrorResponse(errors.New("check time cannot be empty"), "check time cannot be empty", "check time cannot be empty", "ErrCheckTimeCannotBeEmpty")
+	ErrCheckTimeExisted       = appCommon.NewErrorResponse(errors.New("check time cannot be empty"), "check time is already existed", "check time is already existed", "ErrCheckTimeExisted")
+	ErrCheckTimeExceedLimit   = appCommon.NewErrorResponse(errors.New("check time cannot be empty"), "the number of check times is exceeding the limit", "the number of check times is exceeding the limit", "ErrCheckTimeExceedLimit")
 )
 
 type WebsiteCheckTime struct {

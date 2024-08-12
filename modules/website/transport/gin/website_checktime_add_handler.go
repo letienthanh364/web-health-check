@@ -15,25 +15,19 @@ func AddCheckTimeForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
 		var addCheckTimeData modelwebsite.WebsiteCheckTimeCreation
 
 		if err := c.ShouldBind(&addCheckTimeData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
 		if err := addCheckTimeData.Validate(); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
@@ -41,9 +35,7 @@ func AddCheckTimeForWebsite(db *gorm.DB) func(ctx *gin.Context) {
 		business := bizwebsite.NewAddCheckTimeForWebsiteBiz(websiteStorage)
 
 		if err := business.AddCheckTimeForWebsite(c.Request.Context(), id, &addCheckTimeData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 

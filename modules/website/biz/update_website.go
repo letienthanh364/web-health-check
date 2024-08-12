@@ -34,7 +34,7 @@ func (biz *updateWebsiteBiz) UpdateWebsite(ctx context.Context, websiteId int, u
 	// Check if website path is existed
 	website, _ := biz.store.GetWebsite(ctx, map[string]interface{}{"path": updateData.Path})
 	if website != nil && website.Id != websiteId {
-		return modelwebsite.ErrPathIsExisted
+		return modelwebsite.ErrPathExisted
 	}
 
 	// Update website

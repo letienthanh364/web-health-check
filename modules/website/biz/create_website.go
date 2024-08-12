@@ -27,7 +27,7 @@ func (biz *createWebsiteBiz) CreateNewWebsite(ctx context.Context, data *modelwe
 	// Check if website path is existed
 	website, _ := biz.store.GetWebsite(ctx, map[string]interface{}{"path": data.Path})
 	if website != nil {
-		return modelwebsite.ErrPathIsExisted
+		return modelwebsite.ErrPathExisted
 	}
 
 	// Create new website

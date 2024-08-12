@@ -40,7 +40,7 @@ func (biz *addContactForWebsiteBiz) AddContactForWebsite(ctx context.Context, we
 
 	// Check if duplicate the default email
 	if contact.Address == data.DefaultEmail {
-		return modelwebsite.ErrContactIsExisted
+		return modelwebsite.ErrContactExisted
 	}
 
 	// Check the contact store
@@ -59,7 +59,7 @@ func (biz *addContactForWebsiteBiz) AddContactForWebsite(ctx context.Context, we
 
 	for _, c := range contactList {
 		if c.Address == contact.Address {
-			return modelwebsite.ErrContactIsExisted
+			return modelwebsite.ErrContactExisted
 		}
 	}
 

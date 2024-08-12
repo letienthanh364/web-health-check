@@ -1,7 +1,6 @@
 package modelwebsite
 
 import (
-	"errors"
 	"github.com/teddlethal/web-health-check/appCommon"
 	"strings"
 )
@@ -11,13 +10,13 @@ const (
 )
 
 var (
-	ErrWebsiteIsDeleted          = errors.New("website is deleted")
-	ErrNameCannotBeEmpty         = errors.New("name cannot be empty")
-	ErrPathCannotBeEmpty         = errors.New("path cannot be empty")
-	ErrTimeIntervalInvalid       = errors.New("time interval is invalid")
-	ErrRetryInvalid              = errors.New("retry is invalid")
-	ErrDefaultEmailCannotBeEmpty = errors.New("default_email cannot be empty")
-	ErrPathIsExisted             = errors.New("website path is already existed")
+	ErrWebsiteIsDeleted          = appCommon.NewErrorResponse(nil, "website is deleted", "website is deleted", "ErrWebsiteIsDeleted")
+	ErrNameCannotBeEmpty         = appCommon.NewErrorResponse(nil, "name cannot be empty", "name cannot be empty", "ErrNameCannotBeEmpty")
+	ErrPathCannotBeEmpty         = appCommon.NewErrorResponse(nil, "path cannot be empty", "path cannot be empty", "ErrPathCannotBeEmpty")
+	ErrDefaultEmailCannotBeEmpty = appCommon.NewErrorResponse(nil, "default email cannot be empty", "default email cannot be empty", "ErrDefaultEmailCannotBeEmpty")
+	ErrTimeIntervalInvalid       = appCommon.NewErrorResponse(nil, "time interval is invalid", "time interval is invalid", "ErrTimeIntervalInvalid")
+	ErrRetryInvalid              = appCommon.NewErrorResponse(nil, "retry is invalid", "retry is invalid", "ErrRetryInvalid")
+	ErrPathExisted               = appCommon.NewErrorResponse(nil, "website path is already existed", "website path is already existed", "ErrPathExisted")
 )
 
 type Website struct {
