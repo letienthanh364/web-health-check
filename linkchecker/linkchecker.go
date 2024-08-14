@@ -99,16 +99,21 @@ func (lc *LinkChecker) StopCronJob(websiteId int) {
 }
 
 func (lc *LinkChecker) AddCronJob(config modelwebsite.WebConfig) {
-	//_, err := time.LoadLocation(config.TimeZone)
-	//if err != nil {
-	//	log.Printf("Invalid time zone %s for website %s: %v", config.TimeZone, config.Name, err)
-	//	return
-	//}
+	loc, err := time.LoadLocation(config.TimeZone)
+	if err != nil {
+		log.Printf("Invalid time zone %s for website %s: %v", config.TimeZone, config.Name, err)
+		return
+	}
 
 	// Add cron jobs for specific check times
 	for _, checkTime := range config.CheckTimes {
-		//adjustedCheckTime, err := lc.adjustCronExpression(checkTime, loc)
-		entryID, err := lc.cron.AddFunc(checkTime, lc.checkLink(&config))
+		adjustedCheckTime, err := lc.adjustCronExpression(checkTime, loc)
+		log.Printf("Website: %s, adjusted check-time: %s", config.Name, adjustedCheckTime)
+		if err != nil {
+			log.Printf("Failed to adjust cron expression for website %s: %v", config.Name, err)
+			continue
+		}
+		entryID, err := lc.cron.AddFunc(adjustedCheckTime, lc.checkLink(&config))
 		if err != nil {
 			log.Printf("Failed to add cron job for website %s: %v", config.Name, err)
 			continue
@@ -135,24 +140,20 @@ func (lc *LinkChecker) adjustCronExpression(cronExpr string, loc *time.Location)
 		return "", fmt.Errorf("invalid cron expression: %s", cronExpr)
 	}
 
-	// Parse the minute and hour
-	minute, err := strconv.Atoi(parts[0])
-	if err != nil {
-		return "", fmt.Errorf("invalid minute in cron expression: %s", parts[0])
-	}
 	hour, err := strconv.Atoi(parts[1])
 	if err != nil {
 		return "", fmt.Errorf("invalid hour in cron expression: %s", parts[1])
 	}
 
-	// Create a time.Time with the parsed hour and minute in UTC
-	t := time.Date(0, 1, 1, hour, minute, 0, 0, time.UTC)
+	// Create a time.Time in the specified timezone
+	localTime := time.Date(2000, 1, 1, hour, 0, 0, 0, loc)
+	log.Println(localTime)
 
-	// Convert the time to the specified timezone
-	t = t.In(loc)
+	// Convert the time to UTC
+	utcTime := localTime.UTC()
 
 	// Adjust the cron expression with the new hour and minute
-	adjustedCronExpr := fmt.Sprintf("%d %d %s %s %s", t.Minute(), t.Hour(), parts[2], parts[3], parts[4])
+	adjustedCronExpr := fmt.Sprintf("%s %d %s %s %s", parts[0], utcTime.Hour(), parts[2], parts[3], parts[4])
 
 	return adjustedCronExpr, nil
 }

@@ -29,7 +29,7 @@ func CreateWebsite(db *gorm.DB, lc *linkchecker.LinkChecker) func(ctx *gin.Conte
 		}
 
 		updateCronJobBiz := bizwebsite.NewUpdateCronJobForWebsiteBiz(lc)
-		go updateCronJobBiz.UpdateCronJobForWebsite(db, createData.Id)
+		updateCronJobBiz.UpdateCronJobForWebsite(db, createData.Id)
 
 		c.JSON(http.StatusOK, appCommon.SimpleSuccessResponse(createData.Id))
 	}
