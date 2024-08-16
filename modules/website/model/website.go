@@ -6,7 +6,10 @@ import (
 )
 
 const (
-	EntityName = "website"
+	EntityName             = "website"
+	TimeIntervalLowerBound = 300
+	RetryLowerBound        = 0
+	RetryUpperBound        = 5
 )
 
 var (
@@ -14,7 +17,7 @@ var (
 	ErrNameCannotBeEmpty         = appCommon.NewErrorResponse(nil, "name cannot be empty", "name cannot be empty", "ErrNameCannotBeEmpty")
 	ErrPathCannotBeEmpty         = appCommon.NewErrorResponse(nil, "path cannot be empty", "path cannot be empty", "ErrPathCannotBeEmpty")
 	ErrDefaultEmailCannotBeEmpty = appCommon.NewErrorResponse(nil, "default email cannot be empty", "default email cannot be empty", "ErrDefaultEmailCannotBeEmpty")
-	ErrTimeIntervalInvalid       = appCommon.NewErrorResponse(nil, "time interval is invalid", "time interval is invalid", "ErrTimeIntervalInvalid")
+	ErrTimeIntervalInvalid       = appCommon.NewErrorResponse(nil, "time interval is too small", "time interval is too small", "ErrTimeIntervalInvalid")
 	ErrRetryInvalid              = appCommon.NewErrorResponse(nil, "retry is invalid", "retry is invalid", "ErrRetryInvalid")
 	ErrPathExisted               = appCommon.NewErrorResponse(nil, "website path is already existed", "website path is already existed", "ErrPathExisted")
 )
@@ -72,11 +75,11 @@ func (data *WebsiteCreation) Validate() error {
 		return ErrDefaultEmailCannotBeEmpty
 	}
 
-	if data.TimeInterval <= 60 {
+	if data.TimeInterval < TimeIntervalLowerBound {
 		return ErrTimeIntervalInvalid
 	}
 
-	if data.Retry < 0 || data.Retry > 10 {
+	if data.Retry < RetryLowerBound || data.Retry > RetryUpperBound {
 		return ErrRetryInvalid
 	}
 
@@ -121,14 +124,14 @@ func (data *WebsiteUpdate) Validate() error {
 
 	if data.TimeInterval != nil {
 		timeInterval := *data.TimeInterval
-		if timeInterval <= 60 {
+		if timeInterval < TimeIntervalLowerBound {
 			return ErrTimeIntervalInvalid
 		}
 	}
 
 	if data.Retry != nil {
 		retry := *data.Retry
-		if retry < 0 || retry > 24 {
+		if retry < RetryLowerBound || retry > RetryUpperBound {
 			return ErrRetryInvalid
 		}
 	}
